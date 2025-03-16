@@ -1,0 +1,48 @@
+/**
+ * Renting Platform - Metallic Chic Color Scheme
+ * 
+ * This file contains all color variables used throughout the application.
+ * Always reference these variables instead of using direct color values.
+ */
+
+:root {
+  /* Primary Colors */
+  --primary-color: #3d52a0; /* Deep Royal Blue */
+  --primary-light: #7091e6; /* Periwinkle Blue */
+  --primary-dark: #2a3a78; /* Navy Blue */
+
+  /* Accent Colors */
+  --accent-color: #adbdda; /* Soft Lavender Gray */
+  --accent-light: #ede8f5; /* Pale Blue Tint */
+  --accent-dark: #8697c4; /* Steel Blue */
+
+  /* Text Colors */
+  --text-on-primary: #ffffff; /* White for contrast on dark backgrounds */
+  --text-on-accent: #2c2c2c; /* Dark Gray for better readability on light backgrounds */
+  --text-primary: #2c2c2c; /* Slightly darker for readability */
+  --text-secondary: #555555; /* Softer gray for secondary text */
+
+  /* UI Colors */
+  --background-color: #f5f7ff; /* Softer pale blue */
+  --surface-color: #ffffff; /* Clean white for components */
+  --error-color: #e57373; /* Soft Red */
+  --success-color: #81c784; /* Mint Green */
+  --warning-color: #ffd54f; /* Soft Amber */
+
+  /* Border and Shadow Colors */
+  --border-color: #d0d4e0; /* Softer light gray */
+  --divider-color: #e0e0e0; /* Light Gray for dividers */
+  --box-shadow: 0 4px 15px rgba(61, 82, 160, 0.08); /* Subtle shadow with a blue tint */
+
+  /* Gradient Combinations */
+  --primary-gradient: linear-gradient(
+    135deg,
+    var(--primary-light) 0%,
+    var(--primary-dark) 100%
+  );
+  --accent-gradient: linear-gradient(
+    135deg,
+    var(--accent-light) 0%,
+    var(--accent-dark) 100%
+  );
+}

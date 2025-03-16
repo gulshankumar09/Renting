@@ -1,0 +1,134 @@
+<section class="auth-section">
+  <div class="auth-container">
+    <a routerLink="/" class="logo-link">
+      <mat-icon class="logo-icon">business</mat-icon>
+      <span class="logo-text">Renting Platform</span>
+    </a>
+
+    <div class="auth-card">
+      <div class="auth-content">
+        <h1 class="auth-title">Create an account</h1>
+
+        <form
+          [formGroup]="registerForm"
+          (ngSubmit)="onSubmit()"
+          class="auth-form"
+        >
+          <div class="form-group">
+            <label for="name" class="form-label">Your name</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input
+                matInput
+                formControlName="name"
+                id="name"
+                placeholder="John Doe"
+              />
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error *ngIf="registerForm.get('name')?.hasError('required')">
+                Name is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Your email</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input
+                matInput
+                formControlName="email"
+                type="email"
+                id="email"
+                placeholder="name@company.com"
+              />
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error
+                *ngIf="registerForm.get('email')?.hasError('required')"
+              >
+                Email is required
+              </mat-error>
+              <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
+                Please enter a valid email address
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input
+                matInput
+                formControlName="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                id="password"
+                placeholder="••••••••"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="hidePassword = !hidePassword"
+                type="button"
+              >
+                <mat-icon>{{
+                  hidePassword ? "visibility_off" : "visibility"
+                }}</mat-icon>
+              </button>
+              <mat-error
+                *ngIf="registerForm.get('password')?.hasError('required')"
+              >
+                Password is required
+              </mat-error>
+              <mat-error
+                *ngIf="registerForm.get('password')?.hasError('minlength')"
+              >
+                Password must be at least 6 characters
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone number</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input
+                matInput
+                formControlName="phoneNumber"
+                id="phone"
+                placeholder="+1 123 456 7890"
+              />
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error
+                *ngIf="registerForm.get('phoneNumber')?.hasError('pattern')"
+              >
+                Please enter a valid phone number
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="checkbox-container">
+            <mat-checkbox formControlName="isHost" color="primary">
+              I want to list my property (become a host)
+            </mat-checkbox>
+          </div>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="registerForm.invalid || loading"
+            class="submit-btn"
+          >
+            <mat-spinner
+              *ngIf="loading"
+              diameter="20"
+              class="spinner-inside-button"
+            ></mat-spinner>
+            <span *ngIf="!loading">Create account</span>
+          </button>
+
+          <p class="login-prompt">
+            Already have an account? <a routerLink="/auth/login">Sign in</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

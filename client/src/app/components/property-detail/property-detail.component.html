@@ -1,0 +1,226 @@
+<div class="container">
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading property details...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && property" class="property-detail">
+    <div class="property-detail-grid">
+      <div class="property-gallery">
+        <div class="main-image-container">
+          <img
+            [src]="
+              property.imageUrls && property.imageUrls.length
+                ? property.imageUrls[selectedImageIndex]
+                : 'assets/placeholder.jpg'
+            "
+            alt="{{ property.title }}"
+            class="main-image"
+          />
+        </div>
+
+        <div
+          class="thumbnail-container"
+          *ngIf="property.imageUrls && property.imageUrls.length > 1"
+        >
+          <div
+            *ngFor="let image of property.imageUrls; let i = index"
+            class="thumbnail"
+            [class.active]="i === selectedImageIndex"
+            (click)="changeImage(i)"
+          >
+            <img [src]="image" alt="{{ property.title }} image {{ i + 1 }}" />
+          </div>
+        </div>
+      </div>
+
+      <div class="property-info">
+        <div class="property-header">
+          <h1>{{ property.title }}</h1>
+          <div class="property-type">{{ property.type }}</div>
+        </div>
+
+        <p class="location">
+          <mat-icon>location_on</mat-icon> {{ property.location }}
+        </p>
+        <p class="address">{{ property.address }}</p>
+
+        <div class="property-features" *ngIf="property.type !== 'Hotel'">
+          <div class="feature-item">
+            <mat-icon>hotel</mat-icon>
+            <span>{{ property.bedrooms }} Bedrooms</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>bathtub</mat-icon>
+            <span>{{ property.bathrooms }} Bathrooms</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>square_foot</mat-icon>
+            <span>{{ property.area }} sq ft</span>
+          </div>
+        </div>
+
+        <div class="property-price">
+          <span class="price">${{ property.price }}</span>
+          <span class="price-period" *ngIf="property.type !== 'Hotel'"
+            >/month</span
+          >
+          <span class="price-period" *ngIf="property.type === 'Hotel'"
+            >/night</span
+          >
+        </div>
+
+        <div class="property-description">
+          <h2>Description</h2>
+          <p>{{ property.description }}</p>
+        </div>
+
+        <div
+          class="property-amenities"
+          *ngIf="property.amenities && property.amenities.length > 0"
+        >
+          <h2>Amenities</h2>
+          <div class="amenities-grid">
+            <div
+              *ngFor="let amenity of property.amenities"
+              class="amenity-item"
+            >
+              <mat-icon>{{ getAmenityIcon(amenity) }}</mat-icon>
+              <span>{{ amenity }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-container">
+        <mat-card>
+          <mat-card-title>Book this property</mat-card-title>
+
+          <mat-card-content>
+            <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+              <div class="date-range-container">
+                <mat-form-field appearance="outline">
+                  <mat-label>Check-in Date</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="checkInPicker"
+                    formControlName="checkInDate"
+                    [min]="minDate"
+                    [matDatepickerFilter]="dateFilter"
+                  />
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="checkInPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #checkInPicker></mat-datepicker>
+                  <mat-error
+                    *ngIf="bookingForm.get('checkInDate')?.hasError('required')"
+                  >
+                    Check-in date is required
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Check-out Date</mat-label>
+                  <input
+                    matInput
+                    [matDatepicker]="checkOutPicker"
+                    formControlName="checkOutDate"
+                    [min]="bookingForm.get('checkInDate')?.value || minDate"
+                    [matDatepickerFilter]="dateFilter"
+                  />
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="checkOutPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #checkOutPicker></mat-datepicker>
+                  <mat-error
+                    *ngIf="
+                      bookingForm.get('checkOutDate')?.hasError('required')
+                    "
+                  >
+                    Check-out date is required
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Number of Guests</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="guestCount"
+                  min="1"
+                />
+                <mat-error
+                  *ngIf="bookingForm.get('guestCount')?.hasError('required')"
+                >
+                  Number of guests is required
+                </mat-error>
+                <mat-error
+                  *ngIf="bookingForm.get('guestCount')?.hasError('min')"
+                >
+                  At least 1 guest is required
+                </mat-error>
+              </mat-form-field>
+
+              <div
+                class="price-calculation"
+                *ngIf="bookingForm.valid && calculateTotalPrice() > 0"
+              >
+                <div class="price-row">
+                  <span
+                    >${{ property.price }} x
+                    {{ calculateTotalPrice() / property.price }} nights</span
+                  >
+                  <span>${{ calculateTotalPrice() }}</span>
+                </div>
+                <div class="price-row">
+                  <span>Service fee</span>
+                  <span
+                    >${{ calculateTotalPrice() * 0.1 | number : "1.0-2" }}</span
+                  >
+                </div>
+                <div class="price-row total">
+                  <span>Total</span>
+                  <span
+                    >${{ calculateTotalPrice() * 1.1 | number : "1.0-2" }}</span
+                  >
+                </div>
+              </div>
+
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                class="full-width"
+                [disabled]="bookingForm.invalid"
+              >
+                Reserve
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="property-map-section">
+      <h2>Location</h2>
+      <div class="map-placeholder">
+        <p>Map will be displayed here</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && !property" class="not-found">
+    <h2>Property Not Found</h2>
+    <p>The property you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button color="primary" routerLink="/properties">
+      Browse Properties
+    </button>
+  </div>
+</div>

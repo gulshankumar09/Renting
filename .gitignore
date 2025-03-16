@@ -1,0 +1,61 @@
+# .NET Core
+*.swp
+*.db
+*.db-shm
+*.db-wal
+*.user
+*.userosscache
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 
+.vs/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# Angular
+client/dist
+client/tmp
+client/out-tsc
+client/bazel-out
+client/node_modules
+client/npm-debug.log
+client/yarn-error.log
+
+# Angular misc
+client/.angular/cache
+client/connect.lock
+client/coverage
+client/libpeerconnection.log
+client/testem.log
+client/typings
+
+# System Files
+.DS_Store
+Thumbs.db 
