@@ -1,0 +1,41 @@
+/* Navigation Bar Styles */
+nav {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Dropdown transition */
+.group:hover .group-hover\:visible {
+  transition-delay: 150ms;
+}
+
+/* Mobile menu button */
+button.fixed {
+  z-index: 50;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+button.fixed:hover {
+  transform: scale(1.05);
+}
+
+/* Active route highlight */
+.text-\[var\(--primary-color\)\] {
+  position: relative;
+}
+
+.text-\[var\(--primary-color\)\]::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.text-\[var\(--primary-color\)\]:hover::after,
+.routerLinkActive::after {
+  transform: scaleX(1);
+}

@@ -39,7 +39,7 @@ msbuild.wrn
 .idea/
 *.sln.iml
 
-# Angular
+# Angular - general
 client/dist
 client/tmp
 client/out-tsc
@@ -48,13 +48,30 @@ client/node_modules
 client/npm-debug.log
 client/yarn-error.log
 
-# Angular misc
+# Angular - Renting.Web
+client/Renting.Web/dist
+client/Renting.Web/tmp
+client/Renting.Web/out-tsc
+client/Renting.Web/bazel-out
+client/Renting.Web/node_modules
+client/Renting.Web/npm-debug.log
+client/Renting.Web/yarn-error.log
+
+# Angular misc - general
 client/.angular/cache
 client/connect.lock
 client/coverage
 client/libpeerconnection.log
 client/testem.log
 client/typings
+
+# Angular misc - Renting.Web
+client/Renting.Web/.angular/cache
+client/Renting.Web/connect.lock
+client/Renting.Web/coverage
+client/Renting.Web/libpeerconnection.log
+client/Renting.Web/testem.log
+client/Renting.Web/typings
 
 # System Files
 .DS_Store

@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Import custom styles */
+@import "./styles/colors.css";
+@import "./styles/font.css";
+
+/* Base styles */
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Apply consistent rounded corners throughout the application */
+button,
+input,
+select,
+.rounded {
+  border-radius: 0.5rem;
+}

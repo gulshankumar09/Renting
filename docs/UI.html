@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renting UI Documentation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Light Theme Variables */
+      :root {
+        --primary-color: #3d52a0;
+        --primary-light: #7091e6;
+        --primary-dark: #2a3a78;
+        --accent-color: #adbbda;
+        --accent-light: #ede8f5;
+        --accent-dark: #8697c4;
+        --background-color: #f5f7ff;
+        --surface-color: #ffffff;
+        --text-primary: #2c2c2c;
+        --text-secondary: #555555;
+        --border-color: #e2e8f0;
+      }
+
+      /* Dark Theme Variables */
+      html.dark {
+        --primary-color: #7091e6;
+        --primary-light: #8da7f0;
+        --primary-dark: #3d52a0;
+        --accent-color: #8697c4;
+        --accent-light: #2c2f36;
+        --accent-dark: #34373f;
+        --background-color: #1c1f26;
+        --surface-color: #2c2f36;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --border-color: #3a3d45;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-primary);
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      .page-container {
+        width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: var(--surface-color);
+        box-shadow: 0 4px 15px rgba(61, 82, 160, 0.08);
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        transition: background-color 0.3s;
+      }
+
+      .page-title {
+        color: var(--primary-color);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--accent-light);
+      }
+
+      .component-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--accent-light);
+        border-radius: 0.5rem;
+        transition: background-color 0.3s;
+      }
+
+      .component-title {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .mockup-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 0.5rem;
+      }
+
+      .search-bar {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--surface-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+      }
+
+      .property-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--surface-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .dashboard-card {
+        background: var(--surface-color);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+      }
+
+      /* Theme Switch Styles */
+      .theme-switch {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--surface-color);
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid var(--border-color);
+        transition: background-color 0.3s;
+      }
+
+      .theme-switch button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+      }
+
+      .theme-switch button.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      input,
+      select {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+      }
+
+      input::placeholder {
+        color: var(--text-secondary);
+      }
+    </style>
+  </head>
+  <body class="p-8">
+    <!-- Theme Switch -->
+    <div class="theme-switch">
+      <button onclick="setTheme('light')" id="lightBtn" class="active">
+        <i class="fas fa-sun"></i>
+      </button>
+      <button onclick="setTheme('dark')" id="darkBtn">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+
+    <!-- Landing Page -->
+    <div class="page-container">
+      <h1 class="page-title">Landing Page</h1>
+      <div class="component-section">
+        <h2 class="component-title">Navigation Bar</h2>
+        <nav
+          class="bg-white border border-[var(--border-color)] px-6 py-4 rounded-xl shadow-sm"
+        >
+          <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Logo and Primary Navigation -->
+            <div class="flex items-center gap-12">
+              <a href="#" class="text-2xl font-bold text-[var(--primary-color)]"
+                >Renting</a
+              >
+              <div class="hidden md:flex items-center gap-8">
+                <!-- Home -->
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors py-2 rounded-lg"
+                >
+                  Home
+                </a>
+
+                <!-- Properties -->
+                <div class="relative group">
+                  <button
+                    class="flex items-center gap-1 text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors py-2 rounded-lg"
+                  >
+                    Properties
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </button>
+                  <!-- Properties Dropdown -->
+                  <div
+                    class="absolute left-0 mt-2 w-48 bg-white border border-[var(--border-color)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all"
+                  >
+                    <div class="py-2">
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        All Properties
+                      </a>
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        Featured
+                      </a>
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        New Listings
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Auth Section -->
+            <div class="flex items-center gap-4">
+              <!-- Not Logged In State -->
+              <div id="guest-nav" class="flex items-center gap-4">
+                <a
+                  href="#"
+                  onclick="toggleAuth('login-container')"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors py-2 px-4 rounded-lg"
+                >
+                  Login
+                </a>
+                <a
+                  href="#"
+                  onclick="toggleAuth('register-container')"
+                  class="bg-[var(--primary-color)] text-white hover:bg-[var(--primary-dark)] transition-colors py-2 px-6 rounded-lg"
+                >
+                  Sign Up
+                </a>
+              </div>
+
+              <!-- Logged In User State -->
+              <div id="user-nav" class="hidden">
+                <div class="relative group">
+                  <button
+                    class="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors py-2 px-4 rounded-lg"
+                  >
+                    <i class="fas fa-user-circle text-xl"></i>
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </button>
+                  <!-- User Dropdown -->
+                  <div
+                    class="absolute right-0 mt-2 w-48 bg-white border border-[var(--border-color)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all"
+                  >
+                    <div class="py-2">
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        <i class="fas fa-user mr-2"></i>Profile
+                      </a>
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        <i class="fas fa-calendar mr-2"></i>Bookings
+                      </a>
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        <i class="fas fa-heart mr-2"></i>Favorites
+                      </a>
+                      <a
+                        href="#"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] hover:bg-[var(--accent-light)]"
+                      >
+                        <i class="fas fa-star mr-2"></i>Reviews
+                      </a>
+                      <hr class="my-2 border-[var(--border-color)]" />
+                      <a
+                        href="#"
+                        onclick="handleLogout()"
+                        class="block px-4 py-2 text-[var(--text-secondary)] hover:text-red-600 hover:bg-[var(--accent-light)]"
+                      >
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Host Dashboard (Only visible for hosts) -->
+              <div id="host-nav" class="hidden">
+                <a
+                  href="#"
+                  class="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors py-2 px-4 rounded-lg"
+                >
+                  <i class="fas fa-home text-xl"></i>
+                  Host Dashboard
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="component-section">
+        <h2 class="component-title">Hero Section</h2>
+        <div class="search-bar">
+          <input
+            type="text"
+            placeholder="Location"
+            class="p-2 border rounded"
+          />
+          <input type="date" class="p-2 border rounded" />
+          <input
+            type="number"
+            placeholder="Guests"
+            class="p-2 border rounded"
+          />
+          <button class="bg-primary-color text-white px-4 py-2 rounded">
+            Search
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property Listing Page -->
+    <div class="page-container">
+      <h1 class="page-title">Property Listing Page</h1>
+      <div class="component-section">
+        <h2 class="component-title">Search Filters</h2>
+        <div class="flex gap-4 p-4 bg-white rounded">
+          <select class="p-2 border rounded">
+            <option>Property Type</option>
+            <option>Hotel</option>
+            <option>House</option>
+            <option>PG</option>
+          </select>
+          <select class="p-2 border rounded">
+            <option>Price Range</option>
+            <option>$0 - $100</option>
+            <option>$100 - $500</option>
+            <option>$500+</option>
+          </select>
+          <select class="p-2 border rounded">
+            <option>Sort By</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+            <option>Rating</option>
+          </select>
+        </div>
+      </div>
+      <div class="component-section">
+        <h2 class="component-title">Property Cards</h2>
+        <div class="property-card">
+          <div class="w-48 h-32 bg-gray-200 rounded"></div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold">Luxury Hotel Room</h3>
+            <p class="text-gray-600">Downtown Area</p>
+            <div class="flex gap-2 mt-2">
+              <span class="bg-accent-light px-2 py-1 rounded">4.8 ★</span>
+              <span class="text-primary-color font-bold">$200/night</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property Detail Page -->
+    <div class="page-container">
+      <h1 class="page-title">Property Detail Page</h1>
+      <div class="component-section">
+        <h2 class="component-title">Image Gallery</h2>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="h-48 bg-gray-200 rounded"></div>
+          <div class="h-48 bg-gray-200 rounded"></div>
+          <div class="h-48 bg-gray-200 rounded"></div>
+          <div class="h-48 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      <div class="component-section">
+        <h2 class="component-title">Property Information</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-xl font-bold">Luxury Hotel Room</h3>
+            <p class="text-gray-600">Downtown Area</p>
+            <div class="flex gap-2 mt-2">
+              <span class="bg-accent-light px-2 py-1 rounded">4.8 ★</span>
+              <span class="text-primary-color font-bold">$200/night</span>
+            </div>
+          </div>
+          <div class="bg-accent-light p-4 rounded">
+            <h3 class="font-bold mb-2">Book Now</h3>
+            <div class="space-y-2">
+              <input type="date" class="w-full p-2 border rounded" />
+              <input
+                type="number"
+                placeholder="Guests"
+                class="w-full p-2 border rounded"
+              />
+              <button
+                class="w-full bg-primary-color text-white px-4 py-2 rounded"
+              >
+                Reserve
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div class="page-container">
+      <h1 class="page-title">User Dashboard</h1>
+      <div class="component-section">
+        <h2 class="component-title">Dashboard Overview</h2>
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3 class="font-bold">Upcoming Bookings</h3>
+            <p class="text-2xl font-bold text-primary-color">3</p>
+          </div>
+          <div class="dashboard-card">
+            <h3 class="font-bold">Past Stays</h3>
+            <p class="text-2xl font-bold text-primary-color">12</p>
+          </div>
+          <div class="dashboard-card">
+            <h3 class="font-bold">Saved Properties</h3>
+            <p class="text-2xl font-bold text-primary-color">8</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Host Dashboard -->
+    <div class="page-container">
+      <h1 class="page-title">Host Dashboard</h1>
+      <div class="component-section">
+        <h2 class="component-title">Property Management</h2>
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3 class="font-bold">Active Listings</h3>
+            <p class="text-2xl font-bold text-primary-color">5</p>
+          </div>
+          <div class="dashboard-card">
+            <h3 class="font-bold">Pending Requests</h3>
+            <p class="text-2xl font-bold text-primary-color">2</p>
+          </div>
+          <div class="dashboard-card">
+            <h3 class="font-bold">Total Revenue</h3>
+            <p class="text-2xl font-bold text-primary-color">$12,500</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authentication Pages -->
+    <!-- Login Page Container -->
+    <div class="page-container" id="login-container">
+      <h1 class="page-title">Login</h1>
+      <div class="max-w-md mx-auto">
+        <h1 class="text-4xl font-bold mb-2 text-[var(--text-primary)]">
+          Welcome back
+        </h1>
+        <p class="text-[var(--text-secondary)] mb-8">
+          Don't have an account?
+          <a
+            href="#"
+            onclick="toggleAuth('register-container')"
+            class="text-[var(--primary-light)] hover:text-[var(--primary-color)]"
+            >Sign up</a
+          >
+        </p>
+
+        <!-- Social Sign In Buttons -->
+        <div class="space-y-4 mb-8">
+          <button
+            class="w-full flex items-center justify-center gap-2 bg-[var(--accent-light)] hover:bg-[var(--accent-dark)] text-[var(--text-primary)] px-6 py-3 rounded-lg border border-[var(--border-color)] transition-colors"
+          >
+            <img
+              src="https://www.google.com/favicon.ico"
+              alt="Google"
+              class="w-5 h-5"
+            />
+            Sign in with Google
+          </button>
+          <button
+            class="w-full flex items-center justify-center gap-2 bg-[var(--accent-light)] hover:bg-[var(--accent-dark)] text-[var(--text-primary)] px-6 py-3 rounded-lg border border-[var(--border-color)] transition-colors"
+          >
+            <i class="fab fa-apple text-xl"></i>
+            Sign in with Apple
+          </button>
+        </div>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4 mb-8">
+          <div class="flex-1 h-px bg-[var(--border-color)]"></div>
+          <span class="text-[var(--text-secondary)]">or</span>
+          <div class="flex-1 h-px bg-[var(--border-color)]"></div>
+        </div>
+
+        <!-- Email/Password Form -->
+        <form class="space-y-6">
+          <div>
+            <label class="block text-[var(--text-secondary)] mb-2">Email</label>
+            <input
+              type="email"
+              placeholder="name@company.com"
+              class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]"
+            />
+          </div>
+          <div>
+            <label class="block text-[var(--text-secondary)] mb-2"
+              >Password</label
+            >
+            <input
+              type="password"
+              placeholder="••••••••"
+              class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]"
+            />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                class="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--surface-color)]"
+              />
+              <span class="text-[var(--text-secondary)]">Remember me</span>
+            </label>
+            <a
+              href="#"
+              class="text-[var(--primary-light)] hover:text-[var(--primary-color)]"
+              >Forgot password?</a
+            >
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-[var(--primary-light)] hover:bg-[var(--primary-color)] text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
+            Sign in to your account
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Register Page Container -->
+    <div class="page-container hidden" id="register-container">
+      <h1 class="page-title">Register</h1>
+      <div class="max-w-md mx-auto">
+        <h1 class="text-4xl font-bold mb-2 text-[var(--text-primary)]">
+          Create an Account
+        </h1>
+        <p class="text-[var(--text-secondary)] mb-8">
+          Already have an account?
+          <a
+            href="#"
+            onclick="toggleAuth('login-container')"
+            class="text-[var(--primary-light)] hover:text-[var(--primary-color)]"
+            >Sign in</a
+          >
+        </p>
+
+        <!-- Registration Form Fields -->
+        <form class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[var(--text-secondary)] mb-2"
+                >Your email</label
+              >
+              <input
+                type="email"
+                placeholder="name@company.com"
+                class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]"
+              />
+            </div>
+            <div>
+              <label class="block text-[var(--text-secondary)] mb-2"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                placeholder="e.g. Bonnie Green"
+                class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[var(--text-secondary)] mb-2"
+                >Country</label
+              >
+              <select
+                class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)]"
+              >
+                <option value="">Choose a country</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="FR">France</option>
+                <option value="DE">Germany</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[var(--text-secondary)] mb-2"
+                >Password</label
+              >
+              <input
+                type="password"
+                placeholder="••••••••"
+                class="w-full px-4 py-3 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-lg focus:outline-none focus:border-[var(--primary-light)] text-[var(--text-primary)] placeholder-[var(--text-secondary)]"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4 mb-8">
+            <div class="flex-1 h-px bg-[var(--border-color)]"></div>
+            <span class="text-[var(--text-secondary)]">or</span>
+            <div class="flex-1 h-px bg-[var(--border-color)]"></div>
+          </div>
+
+          <!-- Social Sign Up Buttons -->
+          <div class="space-y-4">
+            <button
+              class="w-full flex items-center justify-center gap-2 bg-[var(--accent-light)] hover:bg-[var(--accent-dark)] text-[var(--text-primary)] px-6 py-3 rounded-lg border border-[var(--border-color)] transition-colors"
+            >
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google"
+                class="w-5 h-5"
+              />
+              Sign up with Google
+            </button>
+            <button
+              class="w-full flex items-center justify-center gap-2 bg-[var(--accent-light)] hover:bg-[var(--accent-dark)] text-[var(--text-primary)] px-6 py-3 rounded-lg border border-[var(--border-color)] transition-colors"
+            >
+              <i class="fab fa-apple text-xl"></i>
+              Sign up with Apple
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                class="w-4 h-4 rounded border-[var(--border-color)] bg-[var(--surface-color)]"
+              />
+              <span class="text-[var(--text-secondary)]"
+                >I agree to the Terms and Conditions</span
+              >
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-[var(--primary-light)] hover:bg-[var(--primary-color)] text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
+            Create account
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function setTheme(theme) {
+        const html = document.documentElement;
+        const lightBtn = document.getElementById("lightBtn");
+        const darkBtn = document.getElementById("darkBtn");
+
+        html.className = theme;
+
+        // Update button states
+        if (theme === "light") {
+          lightBtn.classList.add("active");
+          darkBtn.classList.remove("active");
+        } else {
+          darkBtn.classList.add("active");
+          lightBtn.classList.remove("active");
+        }
+
+        // Store theme preference
+        localStorage.setItem("theme", theme);
+      }
+
+      function toggleAuth(showContainer) {
+        // Hide all auth containers
+        document.getElementById("login-container").classList.add("hidden");
+        document.getElementById("register-container").classList.add("hidden");
+
+        // Show the requested container
+        document.getElementById(showContainer).classList.remove("hidden");
+      }
+
+      function toggleUserState(isLoggedIn, isHost = false) {
+        const guestNav = document.getElementById("guest-nav");
+        const userNav = document.getElementById("user-nav");
+        const hostNav = document.getElementById("host-nav");
+
+        if (isLoggedIn) {
+          guestNav.classList.add("hidden");
+          userNav.classList.remove("hidden");
+          if (isHost) {
+            hostNav.classList.remove("hidden");
+          } else {
+            hostNav.classList.add("hidden");
+          }
+        } else {
+          guestNav.classList.remove("hidden");
+          userNav.classList.add("hidden");
+          hostNav.classList.add("hidden");
+        }
+      }
+
+      function handleLogout() {
+        // Add logout logic here
+        toggleUserState(false);
+      }
+
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem("theme") || "light";
+      setTheme(savedTheme);
+    </script>
+  </body>
+</html>

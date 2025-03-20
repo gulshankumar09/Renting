@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>RentingWeb</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <!-- Configure Tailwind with our colors -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "primary-color": "var(--primary-color)",
+              "primary-light": "var(--primary-light)",
+              "primary-dark": "var(--primary-dark)",
+              "accent-color": "var(--accent-color)",
+              "accent-light": "var(--accent-light)",
+              "accent-dark": "var(--accent-dark)",
+              "background-color": "var(--background-color)",
+              "surface-color": "var(--surface-color)",
+              "text-primary": "var(--text-primary)",
+              "text-secondary": "var(--text-secondary)",
+              "border-color": "var(--border-color)",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <!-- Theme Switching Script -->
+    <script>
+      function setTheme(theme) {
+        const html = document.documentElement;
+        html.className = theme;
+        localStorage.setItem("theme", theme);
+      }
+
+      // Check for saved theme preference
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        setTheme(savedTheme);
+      });
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

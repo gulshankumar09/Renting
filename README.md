@@ -14,36 +14,6 @@ A comprehensive SaaS application for renting properties including hotels, houses
 - **Host Dashboard**: For property owners to manage their listings
 - **Admin Panel**: For platform administration and monitoring
 
-## Color Palette
-
-The application uses a consistent Metallic Chic color scheme for a modern, sophisticated look:
-
-### Primary Colors
-
-- Primary: `#3D52A0` - Deep Royal Blue
-- Primary Light: `#7091F6` - Periwinkle Blue
-- Primary Dark: `#2A3A78` - Navy Blue
-
-### Accent Colors
-
-- Accent: `#ADBDDA` - Soft Lavender Gray
-- Accent Light: `#D6DEFF` - Light Periwinkle
-- Accent Dark: `#8697C4` - Steel Blue
-
-### UI Colors
-
-- Background: `#EDF0FF` - Pale Blue Background
-- Surface: `#FFFFFF` - White for cards and components
-- Error: `#E57373` - Soft Red
-- Success: `#81C784` - Mint Green
-- Warning: `#FFD54F` - Soft Amber
-
-### Text Colors
-
-- Text Primary: `#333333` - Dark Gray for main text
-- Text Secondary: `#666666` - Medium Gray for secondary text
-- Text on Primary: `#FFFFFF` - White text on dark backgrounds
-- Text on Accent: `#333333` - Dark Gray text on light backgrounds
 
 ## Typography System
 

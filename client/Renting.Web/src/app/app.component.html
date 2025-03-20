@@ -1,0 +1,346 @@
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
+<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<style>
+  :host {
+    --bright-blue: oklch(51.01% 0.274 263.83);
+    --electric-violet: oklch(53.18% 0.28 296.97);
+    --french-violet: oklch(47.66% 0.246 305.88);
+    --vivid-pink: oklch(69.02% 0.277 332.77);
+    --hot-red: oklch(61.42% 0.238 15.34);
+    --orange-red: oklch(63.32% 0.24 31.68);
+
+    --gray-900: oklch(19.37% 0.006 300.98);
+    --gray-700: oklch(36.98% 0.014 302.71);
+    --gray-400: oklch(70.9% 0.015 304.04);
+
+    --red-to-pink-to-purple-vertical-gradient: linear-gradient(
+      180deg,
+      var(--orange-red) 0%,
+      var(--vivid-pink) 50%,
+      var(--electric-violet) 100%
+    );
+
+    --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
+      90deg,
+      var(--orange-red) 0%,
+      var(--vivid-pink) 50%,
+      var(--electric-violet) 100%
+    );
+
+    --pill-accent: var(--bright-blue);
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1 {
+    font-size: 3.125rem;
+    color: var(--gray-900);
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: -0.125rem;
+    margin: 0;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
+  p {
+    margin: 0;
+    color: var(--gray-700);
+  }
+
+  main {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: inherit;
+    position: relative;
+  }
+
+  .angular-logo {
+    max-width: 9.2rem;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  .content h1 {
+    margin-top: 1.75rem;
+  }
+
+  .content p {
+    margin-top: 1.5rem;
+  }
+
+  .divider {
+    width: 1px;
+    background: var(--red-to-pink-to-purple-vertical-gradient);
+    margin-inline: 0.5rem;
+  }
+
+  .pill-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .pill {
+    display: flex;
+    align-items: center;
+    --pill-accent: var(--bright-blue);
+    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
+    color: var(--pill-accent);
+    padding-inline: 0.75rem;
+    padding-block: 0.375rem;
+    border-radius: 2.75rem;
+    border: 0;
+    transition: background 0.3s ease;
+    font-family: var(--inter-font);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.4rem;
+    letter-spacing: -0.00875rem;
+    text-decoration: none;
+  }
+
+  .pill:hover {
+    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
+  }
+
+  .pill-group .pill:nth-child(6n + 1) {
+    --pill-accent: var(--bright-blue);
+  }
+  .pill-group .pill:nth-child(6n + 2) {
+    --pill-accent: var(--french-violet);
+  }
+  .pill-group .pill:nth-child(6n + 3),
+  .pill-group .pill:nth-child(6n + 4),
+  .pill-group .pill:nth-child(6n + 5) {
+    --pill-accent: var(--hot-red);
+  }
+
+  .pill-group svg {
+    margin-inline-start: 0.25rem;
+  }
+
+  .social-links {
+    display: flex;
+    align-items: center;
+    gap: 0.73rem;
+    margin-top: 1.5rem;
+  }
+
+  .social-links path {
+    transition: fill 0.3s ease;
+    fill: var(--gray-400);
+  }
+
+  .social-links a:hover svg path {
+    fill: var(--gray-900);
+  }
+
+  @media screen and (max-width: 650px) {
+    .content {
+      flex-direction: column;
+      width: max-content;
+    }
+
+    .divider {
+      height: 1px;
+      width: 100%;
+      background: var(--red-to-pink-to-purple-horizontal-gradient);
+      margin-block: 1.5rem;
+    }
+  }
+</style>
+
+<div class="min-h-screen bg-[var(--background-color)]">
+  <header
+    class="sticky top-0 z-50 py-4 px-4 sm:px-6 lg:px-8 bg-[var(--background-color)]"
+  >
+    <app-navigation></app-navigation>
+  </header>
+
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer
+    class="bg-[var(--surface-color)] border-t border-[var(--border-color)] py-8 mt-12"
+  >
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between">
+        <div class="mb-8 md:mb-0">
+          <h2 class="text-2xl font-bold text-[var(--primary-color)]">
+            Renting
+          </h2>
+          <p class="text-[var(--text-secondary)] mt-2 max-w-md">
+            Find your perfect accommodation with ease. Hotels, houses, and PG
+            options all in one place.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="font-semibold text-[var(--text-primary)] mb-3">
+              Company
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Press</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-semibold text-[var(--text-primary)] mb-3">
+              Support
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Safety</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Cancellation Options</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-semibold text-[var(--text-primary)] mb-3">Legal</h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Terms of Service</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Privacy Policy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+                  >Cookie Settings</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="border-t border-[var(--border-color)] mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
+      >
+        <p class="text-[var(--text-secondary)] text-sm mb-4 md:mb-0">
+          © 2025 Renting. All rights reserved.
+        </p>
+
+        <div class="flex space-x-4">
+          <a
+            href="#"
+            class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+              ></path>
+            </svg>
+          </a>
+          <a
+            href="#"
+            class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+              />
+            </svg>
+          </a>
+          <a
+            href="#"
+            class="text-[var(--text-secondary)] hover:text-[var(--primary-color)] transition-colors"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<router-outlet />
