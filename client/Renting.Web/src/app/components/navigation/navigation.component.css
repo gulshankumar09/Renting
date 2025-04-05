@@ -39,3 +39,30 @@ button.fixed:hover {
 .routerLinkActive::after {
   transform: scaleX(1);
 }
+
+/* PG Stays Hero Section */
+.hero-section {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .hero-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
