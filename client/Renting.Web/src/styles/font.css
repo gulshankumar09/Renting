@@ -1,14 +1,35 @@
-/* Import Inter font from Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 /* Font Variables */
 :root {
-  --font-family: "Inter", sans-serif;
+  --font-family-montserrat: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-family-poppins: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+  "Segoe UI Emoji", "Segoe UI Symbol";
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+}
+
+.font-montserrat {
+  font-family: var(--font-family-montserrat);
+}
+
+.font-poppins {
+  font-family: var(--font-family-poppins);
+}
+
+.heading {
+  font-family: var(--font-family-montserrat);
+  font-weight: var(--font-weight-bold);
+}
+
+.body {
+  font-family: var(--font-family-poppins);
+  font-weight: var(--font-weight-regular);
 }
 
 /* Typography Utility Classes */
