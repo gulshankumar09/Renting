@@ -1,6 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pg-stays',
@@ -57,6 +58,8 @@ export class PgStaysComponent {
       nonVeg: false,
     },
   };
+
+  constructor(private router: Router) {}
 
   // Close dropdowns when clicking outside
   @HostListener('document:click', ['$event'])
@@ -119,8 +122,7 @@ export class PgStaysComponent {
   }
 
   applySearch(): void {
-    // Here you would implement the actual search functionality
-    // This would typically involve making an API call with the selected criteria
+    // Log the search criteria
     console.log('Searching with criteria:', {
       location: this.location,
       budget: this.budget,
@@ -134,6 +136,18 @@ export class PgStaysComponent {
     this.showFilters = false;
     this.showAmenities = false;
     this.showFoodOptions = false;
+
+    // Create query parameters
+    const queryParams = {
+      location: this.location,
+      budget: this.budget,
+      roomType: this.roomType,
+      gender: this.filters.gender,
+      foodIncluded: this.foodOptions.included,
+    };
+
+    // Navigate to search results page with query parameters
+    this.router.navigate(['/search-results'], { queryParams });
   }
 
   resetFilters(): void {

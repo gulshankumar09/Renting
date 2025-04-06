@@ -1,0 +1,633 @@
+<!-- Search Results Header -->
+<!-- <div class="bg-[var(--primary-color)] py-6">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-2xl font-bold text-white">PG Stays in {{ searchParams.location || 'All Locations' }}
+                </h1>
+                <p class="text-white/80 text-sm mt-1">
+                    {{ totalListings }} results found
+                    <span *ngIf="searchParams.budget">· Budget: {{ searchParams.budget }}</span>
+                    <span *ngIf="searchParams.roomType">· Room Type: {{ searchParams.roomType }}</span>
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <select [(ngModel)]="selectedSort" (change)="handleSort()"
+                        class="appearance-none bg-white/10 hover:bg-white/20 text-white pl-4 pr-10 py-2 rounded-lg focus:outline-none">
+                        <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex border border-white/20 rounded-lg overflow-hidden">
+                    <button class="px-3 py-1.5 text-white hover:bg-white/20 transition-colors"
+                        [ngClass]="{'bg-white/30': viewMode === 'grid'}" (click)="viewMode = 'grid'">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="px-3 py-1.5 text-white hover:bg-white/20 transition-colors"
+                        [ngClass]="{'bg-white/30': viewMode === 'map'}" (click)="viewMode = 'map'">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- New Style Search Bar -->
+<div class="mt-6">
+    <div class="container mx-auto">
+        <!-- Search Inputs -->
+        <div class="bg-white rounded-xl shadow flex flex-col md:flex-row max-w-6xl mx-auto">
+            <!-- Location -->
+            <div class="flex-1 p-4 border-b md:border-b-0 md:border-r border-[var(--border-color)]">
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-[var(--text-secondary)] mb-1">Location</label>
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-[var(--primary-color)] mr-2"></i>
+                        <input type="text" [(ngModel)]="searchParams.location" placeholder="City, area or locality"
+                            class="w-full border-none focus:outline-none text-[var(--text-primary)]">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget -->
+            <div class="flex-1 p-4 border-b md:border-b-0 md:border-r border-[var(--border-color)]">
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-[var(--text-secondary)] mb-1">Budget</label>
+                    <div class="flex items-center">
+                        <i class="fas fa-rupee-sign text-[var(--primary-color)] mr-2"></i>
+                        <select [(ngModel)]="searchParams.budget"
+                            class="w-full border-none focus:outline-none text-[var(--text-primary)] appearance-none bg-transparent">
+                            <option value="">Any Budget</option>
+                            <option value="5000-10000">₹5,000 - ₹10,000</option>
+                            <option value="10000-15000">₹10,000 - ₹15,000</option>
+                            <option value="15000-20000">₹15,000 - ₹20,000</option>
+                            <option value="20000+">₹20,000+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Type -->
+            <div class="flex-1 p-4 border-b md:border-b-0 md:border-r border-[var(--border-color)]">
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-[var(--text-secondary)] mb-1">Room Type</label>
+                    <div class="flex items-center">
+                        <i class="fas fa-bed text-[var(--primary-color)] mr-2"></i>
+                        <select [(ngModel)]="searchParams.roomType"
+                            class="w-full border-none focus:outline-none text-[var(--text-primary)] appearance-none bg-transparent">
+                            <option value="">Any Room Type</option>
+                            <option value="Single Sharing">Single Sharing</option>
+                            <option value="Double Sharing">Double Sharing</option>
+                            <option value="Triple Sharing">Triple Sharing</option>
+                            <option value="Multiple Sharing">Multiple Sharing</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <div class="p-4 flex items-center">
+                <button (click)="applyFilters()"
+                    class="w-full md:w-auto bg-[var(--primary-color)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-dark)] transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-search"></i>
+                    <span class="md:inline">Search</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Results Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="py-12 flex flex-col items-center justify-center">
+        <div
+            class="w-12 h-12 border-4 border-[var(--primary-light)] border-t-[var(--primary-color)] rounded-full animate-spin">
+        </div>
+        <p class="mt-4 text-[var(--text-secondary)]">Loading results...</p>
+    </div>
+
+    <!-- No Results State -->
+    <div *ngIf="!loading && pgListings.length === 0" class="py-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-[var(--text-secondary)]" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h2 class="mt-4 text-xl font-bold text-[var(--text-primary)]">No results found</h2>
+        <p class="mt-2 text-[var(--text-secondary)]">Try adjusting your search criteria or filters</p>
+        <button (click)="resetFilters()"
+            class="mt-4 px-6 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-[var(--primary-dark)] transition-colors">
+            Reset Filters
+        </button>
+    </div>
+
+    <!-- Results Grid with Sidebar Filters -->
+    <div *ngIf="!loading && pgListings.length > 0" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Filters Sidebar (Left) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg border border-[var(--border-color)] p-4 sticky top-24">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-[var(--text-primary)]">Filters</h3>
+                    <button (click)="resetFilters()"
+                        class="text-sm text-[var(--primary-light)] hover:text-[var(--primary-color)] transition-colors">
+                        Clear All
+                    </button>
+                </div>
+
+                <div class="overflow-y-auto pr-2 -mr-2" style="max-height: calc(100vh - 200px);">
+                    <!-- Price Filter -->
+                    <div class="mb-5 border-b border-[var(--border-color)] pb-4">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('budget')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Budget</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['budget']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['budget']">
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.budget" value="" name="budget"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Any Budget</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.budget" value="5000-10000"
+                                        name="budget" (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">₹5,000 - ₹10,000</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.budget" value="10000-15000"
+                                        name="budget" (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">₹10,000 - ₹15,000</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.budget" value="15000-20000"
+                                        name="budget" (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">₹15,000 - ₹20,000</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.budget" value="20000+" name="budget"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">₹20,000+</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Type Filter -->
+                    <div class="mb-5 border-b border-[var(--border-color)] pb-4">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('roomType')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Room Type</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['roomType']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['roomType']">
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.roomType" value="" name="roomType"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Any Type</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.roomType" value="Single Sharing"
+                                        (change)="applyFiltersToListings()" name="roomType"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Single Sharing</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.roomType" value="Double Sharing"
+                                        (change)="applyFiltersToListings()" name="roomType"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Double Sharing</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.roomType" value="Triple Sharing"
+                                        (change)="applyFiltersToListings()" name="roomType"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Triple Sharing</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.roomType" value="Multiple Sharing"
+                                        (change)="applyFiltersToListings()" name="roomType"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Multiple Sharing</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gender Filter -->
+                    <div class="mb-5 border-b border-[var(--border-color)] pb-4">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('gender')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Gender</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['gender']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['gender']">
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.gender" value="" name="gender"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Any</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.gender" value="male" name="gender"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Male</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.gender" value="female" name="gender"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Female</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.gender" value="unisex" name="gender"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Unisex</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amenities Filter -->
+                    <div class="mb-5 border-b border-[var(--border-color)] pb-4">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('amenities')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Amenities</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['amenities']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['amenities']">
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" [(ngModel)]="amenityWifi" (change)="applyFiltersToListings()"
+                                        class="form-checkbox text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">WiFi</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" [(ngModel)]="amenityAC" (change)="applyFiltersToListings()"
+                                        class="form-checkbox text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">AC</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" [(ngModel)]="amenityTV" (change)="applyFiltersToListings()"
+                                        class="form-checkbox text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">TV</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" [(ngModel)]="amenityGym" (change)="applyFiltersToListings()"
+                                        class="form-checkbox text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Gym</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" [(ngModel)]="amenityWashing"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-checkbox text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Washing Machine</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food Included Filter -->
+                    <div class="mb-5 border-b border-[var(--border-color)] pb-4">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('food')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Food</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['food']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['food']">
+                            <label class="flex items-center">
+                                <input type="checkbox" [(ngModel)]="searchParams.foodIncluded"
+                                    (change)="applyFiltersToListings()"
+                                    class="form-checkbox text-[var(--primary-color)]">
+                                <span class="ml-2 text-sm">Food Included</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Rating Filter -->
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center cursor-pointer hover:bg-opacity-30 hover:bg-[var(--accent-light)] p-2 rounded transition-colors"
+                            (click)="toggleSection('rating')">
+                            <h4 class="text-sm font-medium text-[var(--text-primary)]">Rating</h4>
+                            <i class="fas fa-chevron-down filter-toggle-icon text-[var(--text-secondary)]"
+                                [class.expanded]="expandedSections['rating']"></i>
+                        </div>
+                        <div class="filter-section-content" [class.expanded]="expandedSections['rating']">
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.rating" value="" name="rating"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm">Any Rating</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.rating" value="4+" name="rating"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm flex items-center">
+                                        <span class="mr-1">4+</span>
+                                        <i class="fas fa-star text-yellow-500"></i>
+                                    </span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" [(ngModel)]="searchParams.rating" value="3+" name="rating"
+                                        (change)="applyFiltersToListings()"
+                                        class="form-radio text-[var(--primary-color)]">
+                                    <span class="ml-2 text-sm flex items-center">
+                                        <span class="mr-1">3+</span>
+                                        <i class="fas fa-star text-yellow-500"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Action Button -->
+                    <div class="mt-8">
+                        <button (click)="resetFilters()"
+                            class="w-full px-4 py-2 text-sm border border-[var(--border-color)] rounded-md hover:bg-opacity-30 hover:bg-[var(--accent-light)] transition-colors">
+                            Clear All Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Grid Column (Right) -->
+        <div [class.lg:col-span-3]="viewMode === 'grid' || viewMode === 'list'"
+            [class.lg:col-span-2]="viewMode === 'map'" class="lg:col-span-3">
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-[var(--text-secondary)]">Showing {{ pgListings.length }} of {{ totalListings }} results
+                </p>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-[var(--text-secondary)]">Sort by:</span>
+                    <select [(ngModel)]="selectedSort" (change)="handleSort()"
+                        class="border border-[var(--border-color)] rounded-lg px-3 py-1.5 text-sm">
+                        <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+                    </select>
+
+                    <div class="flex border border-[var(--border-color)] rounded-lg overflow-hidden">
+                        <button
+                            class="px-3 py-1.5 text-[var(--text-secondary)] hover:bg-[var(--accent-light)] transition-colors"
+                            [ngClass]="{'bg-[var(--primary-light)] text-white': viewMode === 'list'}"
+                            (click)="viewMode = 'list'">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button
+                            class="px-3 py-1.5 text-[var(--text-secondary)] hover:bg-[var(--accent-light)] transition-colors"
+                            [ngClass]="{'bg-[var(--primary-light)] text-white': viewMode === 'grid'}"
+                            (click)="viewMode = 'grid'">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button
+                            class="px-3 py-1.5 text-[var(--text-secondary)] hover:bg-[var(--accent-light)] transition-colors"
+                            [ngClass]="{'bg-[var(--primary-light)] text-white': viewMode === 'map'}"
+                            (click)="viewMode = 'map'">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid View -->
+            <div *ngIf="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- PG Listing Card -->
+                <div *ngFor="let pg of pgListings"
+                    class="bg-[var(--surface-color)] rounded-xl overflow-hidden border border-[var(--border-color)] shadow-sm hover:shadow-md transition-shadow">
+                    <div class="relative">
+                        <div class="h-48 overflow-hidden">
+                            <img [src]="pg.imageUrl" [alt]="pg.name"
+                                class="w-full h-full object-cover transition-transform hover:scale-105">
+                        </div>
+                        <div
+                            class="absolute top-3 right-3 bg-white/80 rounded-lg px-2 py-1 text-sm font-medium text-[var(--primary-color)]">
+                            ₹{{ pg.price }}/month
+                        </div>
+                        <button
+                            class="absolute top-3 left-3 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] transition-colors">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <div *ngIf="pg.type === 'Single Sharing'"
+                            class="absolute bottom-3 left-3 bg-[var(--primary-light)] text-white px-2 py-1 rounded text-xs font-medium">
+                            {{ pg.type }}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-[var(--text-primary)]">{{ pg.name }}</h3>
+                            <div class="flex items-center text-[var(--primary-color)]">
+                                <i class="fas fa-star text-sm"></i>
+                                <span class="ml-1 text-sm font-medium">{{ pg.rating }}</span>
+                            </div>
+                        </div>
+                        <p class="text-[var(--text-secondary)] text-sm mb-3">{{ pg.location }}</p>
+
+                        <!-- Amenities -->
+                        <div class="flex items-center text-[var(--text-secondary)] text-sm mb-3 flex-wrap gap-y-2">
+                            <span *ngIf="pg.gender === 'male'" class="flex items-center mr-4"><i
+                                    class="fas fa-male mr-1"></i> Male</span>
+                            <span *ngIf="pg.gender === 'female'" class="flex items-center mr-4"><i
+                                    class="fas fa-female mr-1"></i> Female</span>
+                            <span *ngIf="pg.gender === 'unisex'" class="flex items-center mr-4"><i
+                                    class="fas fa-user mr-1"></i> Unisex</span>
+                            <span *ngIf="pg.foodIncluded" class="flex items-center mr-4"><i
+                                    class="fas fa-utensils mr-1"></i> Food</span>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span *ngFor="let amenity of pg.amenities.slice(0, 3)"
+                                class="text-xs bg-[var(--accent-light)] text-[var(--text-secondary)] px-2 py-1 rounded-full">
+                                {{ amenity }}
+                            </span>
+                            <span *ngIf="pg.amenities.length > 3"
+                                class="text-xs bg-[var(--accent-light)] text-[var(--text-secondary)] px-2 py-1 rounded-full">
+                                +{{ pg.amenities.length - 3 }} more
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-lg">₹{{ pg.price }}</span>
+                                <span class="text-[var(--text-secondary)] text-sm">/month</span>
+                            </div>
+                            <button
+                                class="text-[var(--primary-light)] hover:text-[var(--primary-color)] font-medium text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div *ngIf="viewMode === 'list'" class="flex flex-col gap-4">
+                <!-- PG Listing Row -->
+                <div *ngFor="let pg of pgListings"
+                    class="bg-[var(--surface-color)] rounded-xl overflow-hidden border border-[var(--border-color)] shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Image Section -->
+                        <div class="relative md:w-1/3 h-48 md:h-auto">
+                            <img [src]="pg.imageUrl" [alt]="pg.name" class="w-full h-full object-cover">
+                            <div
+                                class="absolute top-3 right-3 bg-white/80 rounded-lg px-2 py-1 text-sm font-medium text-[var(--primary-color)]">
+                                ₹{{ pg.price }}/month
+                            </div>
+                            <button
+                                class="absolute top-3 left-3 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] transition-colors">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <div *ngIf="pg.type === 'Single Sharing'"
+                                class="absolute bottom-3 left-3 bg-[var(--primary-light)] text-white px-2 py-1 rounded text-xs font-medium">
+                                {{ pg.type }}
+                            </div>
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="p-4 md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-xl font-bold text-[var(--text-primary)]">{{ pg.name }}</h3>
+                                    <div class="flex items-center text-[var(--primary-color)]">
+                                        <i class="fas fa-star"></i>
+                                        <span class="ml-1 font-medium">{{ pg.rating }}</span>
+                                        <span class="text-[var(--text-secondary)] text-sm ml-1">({{ pg.reviewCount }}
+                                            reviews)</span>
+                                    </div>
+                                </div>
+                                <p class="text-[var(--text-secondary)] mb-3">{{ pg.location }}</p>
+
+                                <!-- Details in List View -->
+                                <div class="grid grid-cols-2 gap-y-2 gap-x-4 mb-4">
+                                    <div class="flex items-center text-[var(--text-secondary)]">
+                                        <i class="fas fa-bed mr-2 text-[var(--primary-color)]"></i>
+                                        <span>{{ pg.type }}</span>
+                                    </div>
+                                    <div class="flex items-center text-[var(--text-secondary)]">
+                                        <i class="fas fa-user mr-2 text-[var(--primary-color)]"></i>
+                                        <span>{{ pg.gender | titlecase }}</span>
+                                    </div>
+                                    <div class="flex items-center text-[var(--text-secondary)]">
+                                        <i class="fas fa-utensils mr-2 text-[var(--primary-color)]"></i>
+                                        <span>{{ pg.foodIncluded ? 'Food Included' : 'Food Not Included' }}</span>
+                                    </div>
+                                    <div class="flex items-center text-[var(--text-secondary)]">
+                                        <i class="fas fa-map-marker-alt mr-2 text-[var(--primary-color)]"></i>
+                                        <span>{{ pg.location.split(',')[0] }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Amenities List -->
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    <span *ngFor="let amenity of pg.amenities"
+                                        class="text-xs bg-[var(--accent-light)] text-[var(--text-secondary)] px-2 py-1 rounded-full">
+                                        {{ amenity }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex justify-between items-center mt-2 pt-2 border-t border-[var(--border-color)]">
+                                <div>
+                                    <span class="font-bold text-xl">₹{{ pg.price }}</span>
+                                    <span class="text-[var(--text-secondary)] text-sm">/month</span>
+                                </div>
+                                <button
+                                    class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] transition-colors">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8 flex justify-center">
+                <nav class="flex items-center gap-2">
+                    <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"
+                        class="w-10 h-10 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--accent-light)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <button *ngFor="let page of getPageNumbers()"
+                        [class.bg-[var(--primary-light)]]="page === currentPage"
+                        [class.text-white]="page === currentPage"
+                        [class.text-[var(--text-secondary)]]="page !== currentPage" (click)="changePage(page)"
+                        class="w-10 h-10 rounded-lg border border-[var(--border-color)] flex items-center justify-center hover:bg-[var(--accent-light)] transition-colors">
+                        {{ page }}
+                    </button>
+
+                    <button [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"
+                        class="w-10 h-10 rounded-lg border border-[var(--border-color)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--accent-light)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Map Column (only shown in map view) -->
+        <div *ngIf="viewMode === 'map'"
+            class="h-[800px] rounded-xl overflow-hidden border border-[var(--border-color)] sticky top-24">
+            <!-- Map Placeholder (would be replaced with actual map) -->
+            <div class="h-full w-full bg-gray-200 relative">
+                <img src="https://maps.googleapis.com/maps/api/staticmap?center=Bangalore,India&zoom=12&size=600x800&markers=color:red%7CBangalore,India&key=YOUR_API_KEY"
+                    alt="Map" class="w-full h-full object-cover opacity-50">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <p class="text-lg font-medium text-gray-700">Interactive Map Would Display Here</p>
+                </div>
+
+                <!-- Map Controls (mockup) -->
+                <div class="absolute top-4 right-4 flex flex-col gap-2">
+                    <button
+                        class="w-10 h-10 rounded-lg bg-white shadow flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-lg bg-white shadow flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-lg bg-white shadow flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-location-arrow"></i>
+                    </button>
+                </div>
+
+                <!-- Property Markers (mockup) -->
+                <div *ngFor="let pg of pgListings; let i = index" [class.absolute]="true"
+                    [style.top]="getRandomPosition(i, 'top')" [style.left]="getRandomPosition(i, 'left')">
+                    <div class="relative">
+                        <button
+                            class="w-16 h-8 rounded-full bg-[var(--primary-color)] text-white font-medium flex items-center justify-center shadow-md hover:bg-[var(--primary-dark)] transition-colors">
+                            ₹{{ pg.price/1000 }}K
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
