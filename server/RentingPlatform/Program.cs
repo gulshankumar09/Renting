@@ -15,8 +15,8 @@ builder.Services.AddSwaggerGen();
 
 // Configure Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    // Use SQLite for easier development setup
-    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
+    // Use SQL Server
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -56,24 +56,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Apply Migrations - with better error handling
+// Apply Migrations and seed data
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
     try
     {
-        // Ensure database is created
+        // Ensure database exists
         dbContext.Database.EnsureCreated();
+        logger.LogInformation("Database has been created if it didn't exist");
 
-        // Check if migrations need to be applied
-        if (dbContext.Database.GetPendingMigrations().Any())
-        {
-            dbContext.Database.Migrate();
-        }
+        // Seed default admin user
+        DataSeeder.SeedDefaultAdminAsync(dbContext).GetAwaiter().GetResult();
+        logger.LogInformation("Database seeding completed");
     }
     catch (Exception ex)
     {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while initializing the database.");
     }
 }
