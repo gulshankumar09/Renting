@@ -16,4 +16,11 @@ namespace UserManagement.Models
         Banned,
         PendingVerification
     }
+
+    public enum Role
+    {
+        Admin,
+        User,
+        Manager
+    }
 }

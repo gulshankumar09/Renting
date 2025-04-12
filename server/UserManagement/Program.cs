@@ -84,4 +84,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Seed default admin user
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    await DataSeeder.SeedRolesAsync(roleManager);
+    await DataSeeder.SeedDefaultAdminAsync(userManager);
+}
+
 app.Run();
