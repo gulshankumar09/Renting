@@ -1,6 +1,6 @@
 # Renting Platform
 
-A comprehensive SaaS application for renting properties including hotels, houses, and PG accommodations.
+A comprehensive SaaS application for Booking or Renting properties including hotels, houses, and PG accommodations. We also going to provide a complete trip planning and execution functionalities with AI support.
 
 ## Features
 
@@ -21,59 +21,8 @@ The application uses a consistent typography system for readable and accessible 
 
 ### Font Families
 
-- Primary Font: `'Inter'` - Modern, clean sans-serif for body text
+- Primary Font: `'Poppins'` - Modern, clean sans-serif for body text
 - Heading Font: `'Montserrat'` - More distinctive sans-serif for headings
-
-### Font Sizes
-
-- Extra Small: `0.75rem` (12px) - Fine print, captions
-- Small: `0.875rem` (14px) - Secondary text, labels
-- Base: `1rem` (16px) - Body text
-- Large: `1.125rem` (18px) - Emphasized body text
-- Extra Large: `1.25rem` (20px) - Small headings
-- 2XL: `1.5rem` (24px) - Medium headings
-- 3XL: `1.875rem` (30px) - Large headings
-- 4XL: `2.25rem` (36px) - Extra large headings
-- 5XL: `3rem` (48px) - Hero text
-
-### Font Weights
-
-- Light: `300` - For lighter, more delicate text
-- Regular: `400` - Standard body text
-- Medium: `500` - Slightly emphasized text, buttons
-- Semibold: `600` - Subheadings, important UI elements
-- Bold: `700` - Main headings, strong emphasis
-
-### CSS Variables
-
-The typography system is implemented as CSS variables, available globally:
-
-```css
-:root {
-  /* Font Families */
-  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
-  --font-heading: "Montserrat", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Font Sizes */
-  --text-xs: 0.75rem; /* 12px */
-  --text-sm: 0.875rem; /* 14px */
-  --text-base: 1rem; /* 16px */
-  --text-lg: 1.125rem; /* 18px */
-  --text-xl: 1.25rem; /* 20px */
-  --text-2xl: 1.5rem; /* 24px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-4xl: 2.25rem; /* 36px */
-  --text-5xl: 3rem; /* 48px */
-
-  /* Font Weights */
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-}
-```
 
 ## Research and Development Insights
 
