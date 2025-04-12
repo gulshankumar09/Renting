@@ -5,14 +5,10 @@ using UserManagement.Models;
 
 namespace UserManagement.Data
 {
-    public class UserManagementDbContext : IdentityDbContext<ApplicationUser>
+    public class UserManagementDbContext(DbContextOptions<UserManagementDbContext> options)
+        : IdentityDbContext<ApplicationUser>(options)
     {
-        public UserManagementDbContext(DbContextOptions<UserManagementDbContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<User> Users { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<UserPreferences> UserPreferences { get; set; }
         public DbSet<UserDocument> UserDocuments { get; set; }
 
@@ -20,25 +16,27 @@ namespace UserManagement.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure User
-            modelBuilder.Entity<User>()
+            // Configure UserProfile relationship with ApplicationUser
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(u => u.Profile)
+                .WithOne(p => p.ApplicationUser)
+                .HasForeignKey<UserProfile>(p => p.ApplicationUserId);
+
+            // Configure UserProfile
+            modelBuilder.Entity<UserProfile>()
                 .HasOne(u => u.Preferences)
-                .WithOne(p => p.User)
-                .HasForeignKey<UserPreferences>(p => p.UserId)
+                .WithOne(p => p.UserProfile)
+                .HasForeignKey<UserPreferences>(p => p.UserProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<UserProfile>()
                 .HasMany(u => u.Documents)
-                .WithOne(d => d.User)
-                .HasForeignKey(d => d.UserId)
+                .WithOne(d => d.UserProfile)
+                .HasForeignKey(d => d.UserProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Configure indexes
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.UserId)
-                .IsUnique();
-
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<UserProfile>()
                 .HasIndex(u => u.PhoneNumber)
                 .IsUnique();
 
@@ -52,4 +50,4 @@ namespace UserManagement.Data
                 .IsUnique();
         }
     }
-} 
+}

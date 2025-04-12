@@ -4,7 +4,7 @@ namespace UserManagement.Models
 {
     public class UserDocument : BaseEntity
     {
-        public int UserId { get; set; } // This will be linked to Identity User Id
+        public string UserProfileId { get; set; }
         public string DocumentType { get; set; }
         public string DocumentNumber { get; set; }
         public string FilePath { get; set; }
@@ -17,6 +17,6 @@ namespace UserManagement.Models
         public DateTime? ExpiryDate { get; set; }
 
         // Navigation property
-        public virtual User User { get; set; }
+        public virtual UserProfile UserProfile { get; set; }
     }
-} 
+}

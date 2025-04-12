@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserManagement.Models;
+using UserManagement.Data;
 
 namespace UserManagement.Services
 {
@@ -12,11 +13,16 @@ namespace UserManagement.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly UserManagementDbContext _dbContext;
 
-        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public AuthService(
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration,
+            UserManagementDbContext dbContext)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _dbContext = dbContext;
         }
 
         public async Task<(bool Success, string Token, string RefreshToken)> LoginAsync(string email, string password)
@@ -24,7 +30,7 @@ namespace UserManagement.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, password))
             {
-                return (false, null, null);
+                return (false, string.Empty, string.Empty);
             }
 
             var token = await GenerateJwtToken(user);
@@ -42,8 +48,6 @@ namespace UserManagement.Services
             {
                 UserName = email,
                 Email = email,
-                FirstName = firstName,
-                LastName = lastName,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -53,6 +57,20 @@ namespace UserManagement.Services
                 return (false, string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
+            // Create the UserProfile
+            var profile = new UserProfile
+            {
+                ApplicationUserId = user.Id,
+                FirstName = firstName,
+                LastName = lastName,
+                Status = UserStatus.Active,
+                CreatedBy = user.Id,
+                UpdatedBy = user.Id
+            };
+
+            _dbContext.UserProfiles.Add(profile);
+            await _dbContext.SaveChangesAsync();
+
             return (true, "User registered successfully");
         }
 
@@ -61,17 +79,25 @@ namespace UserManagement.Services
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
             };
+
+            // Include profile data in claims if available
+            var profile = await _dbContext.UserProfiles.FindAsync(user.Id);
+            if (profile != null)
+            {
+                claims.Add(new Claim("FirstName", profile.FirstName));
+                claims.Add(new Claim("LastName", profile.LastName));
+            }
 
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? string.Empty));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryInMinutes"]));
+            var expires = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryInMinutes"] ?? "30"));
 
             var token = new JwtSecurityToken(
                 _configuration["Jwt:Issuer"],
@@ -96,21 +122,21 @@ namespace UserManagement.Services
             var principal = GetPrincipalFromExpiredToken(token);
             if (principal == null)
             {
-                return (false, null, null);
+                return (false, string.Empty, string.Empty);
             }
 
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = userId != null ? await _userManager.FindByIdAsync(userId) : null;
 
             if (user == null)
             {
-                return (false, null, null);
+                return (false, string.Empty, string.Empty);
             }
 
             var storedRefreshToken = await _userManager.GetAuthenticationTokenAsync(user, "Renting", "RefreshToken");
             if (storedRefreshToken != refreshToken)
             {
-                return (false, null, null);
+                return (false, string.Empty, string.Empty);
             }
 
             var newToken = await GenerateJwtToken(user);
@@ -119,14 +145,14 @@ namespace UserManagement.Services
             return (true, newToken, newRefreshToken);
         }
 
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? string.Empty)),
                 ValidateLifetime = false,
                 ValidAudience = _configuration["Jwt:Audience"],
                 ValidIssuer = _configuration["Jwt:Issuer"]
@@ -142,4 +168,4 @@ namespace UserManagement.Services
             return principal;
         }
     }
-} 
+}
