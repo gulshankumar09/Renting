@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserManagement.Data;
 using UserManagement.Models;
+using UserManagement.Models.Entities;
 using UserManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,6 +78,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseGlobalExceptionHandler();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

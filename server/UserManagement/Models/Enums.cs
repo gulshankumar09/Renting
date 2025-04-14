@@ -20,7 +20,9 @@ namespace UserManagement.Models
     public enum Role
     {
         Admin,
-        User,
-        Manager
+        Owner,
+        Manager,
+        Tenant,
+        Guest
     }
 }

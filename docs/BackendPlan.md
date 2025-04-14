@@ -8,7 +8,7 @@ The UserManagement microservice will handle all user-related operations includin
 
 ### Technology Stack
 
-- **Framework**: ASP.NET Core 8.0
+- **Framework**: ASP.NET Core 9.0
 - **Database**: PostgreSQL 16
 - **Authentication**: ASP.NET Identity + JWT
 - **ORM**: Entity Framework Core
