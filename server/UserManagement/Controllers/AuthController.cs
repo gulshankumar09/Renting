@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagement.DTOs;
+using UserManagement.Interfaces;
 using UserManagement.Models.Exceptions;
 using UserManagement.Services;
 
@@ -22,155 +23,48 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IResult> Login([FromBody] LoginRequestDTO request)
     {
-        try
-        {
-            var response = await _authService.LoginAsync(request);
-            return Results.Ok(response);
-        }
-        catch (AuthException ex)
-        {
-            _logger.LogWarning("Authentication failed: {Message}", ex.Message);
-            return Results.Problem(
-                title: "Authentication Failed",
-                detail: ex.Message,
-                statusCode: StatusCodes.Status401Unauthorized,
-                extensions: new Dictionary<string, object?>
-                {
-                    { "errorCode", ex.ErrorCode }
-                }
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during login");
-            return Results.Problem(
-                title: "Internal Server Error",
-                statusCode: StatusCodes.Status500InternalServerError
-            );
-        }
+        var response = await _authService.LoginAsync(request);
+        return Results.Ok(response);
     }
 
     [HttpPost("register")]
     public async Task<IResult> Register([FromBody] RegisterRequestDTO request)
     {
-        try
-        {
-            var response = await _authService.RegisterAsync(request);
-            return Results.Created($"/api/users/{response}", response);
-        }
-        catch (AuthException ex)
-        {
-            _logger.LogWarning("Registration failed: {Message}", ex.Message);
-            return Results.Problem(
-                title: "Registration Failed",
-                detail: ex.Message,
-                statusCode: StatusCodes.Status400BadRequest,
-                extensions: new Dictionary<string, object?>
-                {
-                    { "errorCode", ex.ErrorCode }
-                }
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during registration");
-            return Results.Problem(
-                title: "Internal Server Error",
-                statusCode: StatusCodes.Status500InternalServerError
-            );
-        }
+        var response = await _authService.RegisterAsync(request);
+        return Results.Created($"/api/users/{response}", response);
     }
 
     [HttpPost("refresh-token")]
     public async Task<IResult> RefreshToken([FromBody] RefreshTokenRequestDTO request)
     {
-        try
-        {
-            var response = await _authService.RefreshTokenAsync(request);
-            return Results.Ok(response);
-        }
-        catch (AuthException ex)
-        {
-            _logger.LogWarning("Token refresh failed: {Message}", ex.Message);
-            return Results.Problem(
-                title: "Token Refresh Failed",
-                detail: ex.Message,
-                statusCode: StatusCodes.Status401Unauthorized,
-                extensions: new Dictionary<string, object?>
-                {
-                    { "errorCode", ex.ErrorCode }
-                }
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during token refresh");
-            return Results.Problem(
-                title: "Internal Server Error",
-                statusCode: StatusCodes.Status500InternalServerError
-            );
-        }
+        var response = await _authService.RefreshTokenAsync(request);
+        return Results.Ok(response);
     }
 
     [Authorize]
     [HttpPost("change-password")]
     public async Task<IResult> ChangePassword([FromBody] ChangePasswordRequestDTO request)
     {
-        try
-        {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Results.Unauthorized();
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Results.Unauthorized();
 
-            var result = await _authService.ChangePasswordAsync(userId, request.CurrentPassword, request.NewPassword);
-            if (result.Succeeded)
-                return Results.Ok();
+        var result = await _authService.ChangePasswordAsync(userId, request.CurrentPassword, request.NewPassword);
+        if (result.Succeeded)
+            return Results.Ok();
 
-            return Results.BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
-        }
-        catch (AuthException ex)
-        {
-            _logger.LogWarning("Password change failed: {Message}", ex.Message);
-            return Results.Problem(
-                title: "Password Change Failed",
-                detail: ex.Message,
-                statusCode: StatusCodes.Status400BadRequest,
-                extensions: new Dictionary<string, object?>
-                {
-                    { "errorCode", ex.ErrorCode }
-                }
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during password change");
-            return Results.Problem(
-                title: "Internal Server Error",
-                statusCode: StatusCodes.Status500InternalServerError
-            );
-        }
+        return Results.BadRequest(new { Errors = result.Errors.Select(e => e.Description) });
     }
 
     [Authorize]
     [HttpPost("revoke-token")]
     public async Task<IResult> RevokeToken()
     {
-        try
-        {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Results.Unauthorized();
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Results.Unauthorized();
 
-            var result = await _authService.RevokeTokenAsync(userId);
-            return result ? Results.Ok() : Results.NotFound();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during token revocation");
-            return Results.Problem(
-                title: "Internal Server Error",
-                statusCode: StatusCodes.Status500InternalServerError
-            );
-        }
+        var result = await _authService.RevokeTokenAsync(userId);
+        return result ? Results.Ok() : Results.NotFound();
     }
 }

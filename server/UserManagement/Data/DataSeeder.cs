@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using UserManagement.Models;
+using UserManagement.Models.Entities;
 
 namespace UserManagement.Data;
 

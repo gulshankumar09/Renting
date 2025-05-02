@@ -37,7 +37,6 @@ public record AuthResponseDTO
 {
     public string Token { get; init; } = default!;
     public string RefreshToken { get; init; } = default!;
-    public DateTime Expiration { get; init; }
 }
 
 public record RefreshTokenRequestDTO

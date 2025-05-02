@@ -2,18 +2,23 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:17
     container_name: renting_postgres
+    shm_size: 128mb
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: renting_usermanagement
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - renting_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -23,14 +28,38 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - renting_network
     depends_on:
       - postgres
+    restart: unless-stopped
+
+  # api:
+  #   build:
+  #     context: ./UserManagement
+  #     dockerfile: Dockerfile
+  #   container_name: renting_api
+  #   ports:
+  #     - "5000:80"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ConnectionStrings__DefaultConnection=Host=postgres;Database=renting_usermanagement;Username=postgres;Password=postgres
+  #   networks:
+  #     - renting_network
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:
+    name: renting_postgres_data
+  pgadmin_data:
+    name: renting_pgadmin_data
 
 networks:
   renting_network:
     driver: bridge
+    name: renting_network

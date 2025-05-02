@@ -155,7 +155,7 @@ namespace UserManagement.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("UserManagement.Models.ApplicationUser", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -214,6 +214,12 @@ namespace UserManagement.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -242,7 +248,7 @@ namespace UserManagement.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserDocument", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserDocument", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,7 +318,6 @@ namespace UserManagement.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("VerifiedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -322,7 +327,7 @@ namespace UserManagement.Migrations
                     b.ToTable("UserDocuments");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserPreferences", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserPreferences", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -468,7 +473,7 @@ namespace UserManagement.Migrations
                     b.ToTable("UserPreferences");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserProfile", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserProfile", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -580,7 +585,7 @@ namespace UserManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("UserManagement.Models.ApplicationUser", null)
+                    b.HasOne("UserManagement.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -589,7 +594,7 @@ namespace UserManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("UserManagement.Models.ApplicationUser", null)
+                    b.HasOne("UserManagement.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -604,7 +609,7 @@ namespace UserManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("UserManagement.Models.ApplicationUser", null)
+                    b.HasOne("UserManagement.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -613,16 +618,16 @@ namespace UserManagement.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("UserManagement.Models.ApplicationUser", null)
+                    b.HasOne("UserManagement.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserDocument", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserDocument", b =>
                 {
-                    b.HasOne("UserManagement.Models.UserProfile", "UserProfile")
+                    b.HasOne("UserManagement.Models.Entities.UserProfile", "UserProfile")
                         .WithMany("Documents")
                         .HasForeignKey("UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -631,34 +636,34 @@ namespace UserManagement.Migrations
                     b.Navigation("UserProfile");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserPreferences", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserPreferences", b =>
                 {
-                    b.HasOne("UserManagement.Models.UserProfile", "UserProfile")
+                    b.HasOne("UserManagement.Models.Entities.UserProfile", "UserProfile")
                         .WithOne("Preferences")
-                        .HasForeignKey("UserManagement.Models.UserPreferences", "UserProfileId")
+                        .HasForeignKey("UserManagement.Models.Entities.UserPreferences", "UserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("UserProfile");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserProfile", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserProfile", b =>
                 {
-                    b.HasOne("UserManagement.Models.ApplicationUser", "ApplicationUser")
+                    b.HasOne("UserManagement.Models.Entities.ApplicationUser", "ApplicationUser")
                         .WithOne("Profile")
-                        .HasForeignKey("UserManagement.Models.UserProfile", "ApplicationUserId")
+                        .HasForeignKey("UserManagement.Models.Entities.UserProfile", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.ApplicationUser", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("UserManagement.Models.UserProfile", b =>
+            modelBuilder.Entity("UserManagement.Models.Entities.UserProfile", b =>
                 {
                     b.Navigation("Documents");
 

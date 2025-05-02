@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Shared.Common.Extensions;
 using UserManagement.Data;
-using UserManagement.Models;
 using UserManagement.Models.Entities;
 using UserManagement.Services;
+using UserManagement.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +18,30 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Host.UseDefaultServiceProvider((context, options) =>
+{
+    options.ValidateOnBuild = true;
+    options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+});
+
 // Add DbContext
 builder.Services.AddDbContext<UserManagementDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null);
+            npgsqlOptions.CommandTimeout(60);
+        });
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
+});
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -44,14 +66,17 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = builder.Configuration.GetValue<bool>("Jwt:ValidateIssuer"),
+        ValidateAudience = builder.Configuration.GetValue<bool>("Jwt:ValidateAudience"),
+        ValidateLifetime = builder.Configuration.GetValue<bool>("Jwt:ValidateLifetime"),
+        ValidateIssuerSigningKey = builder.Configuration.GetValue<bool>("Jwt:ValidateIssuerSigningKey"),
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException()))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured"))),
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -67,8 +92,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add AuthService
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddUserManagementServices();
 
 var app = builder.Build();
 
@@ -87,14 +111,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Seed default admin user
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    await DataSeeder.SeedRolesAsync(roleManager);
-    await DataSeeder.SeedDefaultAdminAsync(userManager);
-}
+// Initialize database
+await DatabaseInitializer.InitializeAsync(app.Services);
 
 app.Run();
