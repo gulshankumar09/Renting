@@ -13,6 +13,7 @@ namespace UserManagement.Extensions
         {
             // Add your custom services here
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<JwtTokenService>();
 
             return services;
         }
