@@ -2,19 +2,20 @@ namespace UserManagement.Models
 {
     public enum Gender
     {
+        NotSpecified,
         Male,
         Female,
-        Other,
-        PreferNotToSay
+        NonBinary,
+        Other
     }
 
     public enum UserStatus
     {
+        Pending,
         Active,
-        Inactive,
         Suspended,
-        Banned,
-        PendingVerification
+        Deactivated,
+        Locked
     }
 
     public enum Role
@@ -24,5 +25,23 @@ namespace UserManagement.Models
         Manager,
         Tenant,
         Guest
+    }
+
+    public enum ActivityType
+    {
+        Login,
+        Logout,
+        FailedLogin,
+        Registration,
+        PasswordReset,
+        EmailVerification,
+        ProfileUpdate,
+        PreferenceUpdate,
+        DocumentUpload,
+        DocumentDelete,
+        AccountLocked,
+        AccountUnlocked,
+        RoleAssigned,
+        RoleRemoved
     }
 }

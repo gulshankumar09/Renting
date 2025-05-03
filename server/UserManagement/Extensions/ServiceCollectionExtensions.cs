@@ -12,6 +12,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IUserActivityService, UserActivityService>();
+        services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+        services.AddHttpContextAccessor();
 
         return services;
     }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,13 @@ builder.Host.UseDefaultServiceProvider((context, options) =>
 {
     options.ValidateOnBuild = true;
     options.ValidateScopes = context.HostingEnvironment.IsDevelopment();
+});
+
+// Configure file upload options
+builder.Services.Configure<FormOptions>(options =>
+{
+    // Set the limit to max file size
+    options.MultipartBodyLengthLimit = builder.Configuration.GetValue<long>("FileStorage:MaxFileSizeBytes", 10 * 1024 * 1024);
 });
 
 // Add DbContext
@@ -110,6 +118,13 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Create document storage directory if it doesn't exist
+var documentsPath = builder.Configuration["FileStorage:BasePath"] ?? "UserFiles";
+if (!Directory.Exists(documentsPath))
+{
+    Directory.CreateDirectory(documentsPath);
+}
 
 // Initialize database
 await DatabaseInitializer.InitializeAsync(app.Services);

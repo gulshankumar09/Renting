@@ -1,10 +1,15 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using UserManagement.DTOs;
 using UserManagement.Interfaces;
 using UserManagement.Models.Entities;
 using UserManagement.Models.Exceptions;
+using UserManagement.Models;
 
 namespace UserManagement.Services;
 
@@ -14,70 +19,176 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
+    private readonly IUserActivityService _activityService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         ILogger<AuthService> logger,
         IJwtTokenService jwtTokenService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IConfiguration configuration,
+        IUserActivityService activityService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _logger = logger;
         _jwtTokenService = jwtTokenService;
         _emailService = emailService;
+        _configuration = configuration;
+        _activityService = activityService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email)
-            ?? throw new AuthException("Invalid email or password", "INVALID_CREDENTIALS");
+        string ipAddress = GetIpAddress();
+        string userAgent = GetUserAgent();
 
-        if (!await _userManager.CheckPasswordAsync(user, request.Password))
-            throw new AuthException("Invalid email or password", "INVALID_CREDENTIALS");
-
-        if (!user.EmailConfirmed && await _userManager.IsEmailConfirmedAsync(user))
+        try
         {
-            user.EmailConfirmed = true;
-            await _userManager.UpdateAsync(user);
-        }
+            var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if (!user.EmailConfirmed)
+            if (user == null)
+            {
+                await _activityService.LogLoginAttemptAsync(
+                    "unknown",
+                    false,
+                    ipAddress,
+                    userAgent,
+                    $"Failed login attempt: User with email {request.Email} not found");
+
+                throw new AuthException("Invalid email or password", "INVALID_CREDENTIALS");
+            }
+
+            if (!await _userManager.CheckPasswordAsync(user, request.Password))
+            {
+                await _activityService.LogLoginAttemptAsync(
+                    user.Id,
+                    false,
+                    ipAddress,
+                    userAgent,
+                    "Failed login attempt: Invalid password");
+
+                throw new AuthException("Invalid email or password", "INVALID_CREDENTIALS");
+            }
+
+            if (!user.EmailConfirmed && await _userManager.IsEmailConfirmedAsync(user))
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                await _activityService.LogLoginAttemptAsync(
+                    user.Id,
+                    false,
+                    ipAddress,
+                    userAgent,
+                    "Failed login attempt: Email not confirmed");
+
+                throw new AuthException("Email not confirmed. Please check your email for verification link.", "EMAIL_NOT_VERIFIED");
+            }
+
+            // Log successful login
+            await _activityService.LogLoginAttemptAsync(
+                user.Id,
+                true,
+                ipAddress,
+                userAgent);
+
+            _logger.LogInformation("User {Email} logged in successfully", request.Email);
+
+            return await GenerateAuthResponseAsync(user);
+        }
+        catch (AuthException)
         {
-            throw new AuthException("Email not confirmed. Please check your email for verification link.", "EMAIL_NOT_VERIFIED");
+            // Rethrow auth exceptions as they're already logged
+            throw;
         }
-
-        _logger.LogInformation("User {Email} logged in successfully", request.Email);
-
-        return await GenerateAuthResponseAsync(user);
+        catch (Exception ex)
+        {
+            // Log unexpected errors
+            _logger.LogError(ex, "Error during login for user: {Email}", request.Email);
+            throw new AuthException("An error occurred during login", "LOGIN_ERROR");
+        }
     }
 
     public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO request)
     {
-        var existingUser = await _userManager.FindByEmailAsync(request.Email);
-        if (existingUser != null)
-            throw new AuthException("User with this email already exists", "EMAIL_EXISTS");
+        string ipAddress = GetIpAddress();
+        string userAgent = GetUserAgent();
 
-        var user = new ApplicationUser
+        try
         {
-            UserName = request.Email,
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            EmailConfirmed = false
-        };
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                await _activityService.LogGenericActivityAsync(
+                    "unknown",
+                    ActivityType.Registration,
+                    $"Registration failed: Email {request.Email} already exists",
+                    ipAddress,
+                    userAgent,
+                    false);
 
-        var result = await _userManager.CreateAsync(user, request.Password);
-        if (!result.Succeeded)
-            throw new AuthException(
-                string.Join(", ", result.Errors.Select(e => e.Description)),
-                "REGISTRATION_FAILED"
-            );
+                throw new AuthException("User with this email already exists", "EMAIL_EXISTS");
+            }
 
-        // Generate email confirmation token and send verification email
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        await _emailService.SendEmailVerificationAsync(user.Email!, user.Id, token);
+            var user = new ApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                EmailConfirmed = false
+            };
 
-        return await GenerateAuthResponseAsync(user);
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+
+                await _activityService.LogGenericActivityAsync(
+                    "unknown",
+                    ActivityType.Registration,
+                    $"Registration failed: {errors}",
+                    ipAddress,
+                    userAgent,
+                    false,
+                    errors);
+
+                throw new AuthException(errors, "REGISTRATION_FAILED");
+            }
+
+            // Log successful registration
+            await _activityService.LogGenericActivityAsync(
+                user.Id,
+                ActivityType.Registration,
+                "User registered successfully",
+                ipAddress,
+                userAgent,
+                true);
+
+            // Generate email confirmation token and send verification email
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            await _emailService.SendEmailVerificationAsync(user.Email!, user.Id, token);
+
+            return await GenerateAuthResponseAsync(user);
+        }
+        catch (AuthException)
+        {
+            // Rethrow auth exceptions as they're already logged
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Log unexpected errors
+            _logger.LogError(ex, "Error during registration for email: {Email}", request.Email);
+            throw new AuthException("An error occurred during registration", "REGISTRATION_ERROR");
+        }
     }
 
     public async Task<AuthResponseDTO> RefreshTokenAsync(RefreshTokenRequestDTO request)
@@ -231,5 +342,25 @@ public class AuthService : IAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    private string GetIpAddress()
+    {
+        var context = _httpContextAccessor.HttpContext;
+        if (context == null)
+            return "Unknown";
+
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        return string.IsNullOrEmpty(ipAddress) ? "Unknown" : ipAddress;
+    }
+
+    private string GetUserAgent()
+    {
+        var context = _httpContextAccessor.HttpContext;
+        if (context == null)
+            return "Unknown";
+
+        var userAgent = context.Request.Headers["User-Agent"].ToString();
+        return string.IsNullOrEmpty(userAgent) ? "Unknown" : userAgent;
     }
 }

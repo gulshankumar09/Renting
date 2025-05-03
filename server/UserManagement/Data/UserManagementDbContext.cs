@@ -15,6 +15,7 @@ public class UserManagementDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<UserProfile> UserProfiles { get; set; }
     public DbSet<UserPreferences> UserPreferences { get; set; }
     public DbSet<UserDocument> UserDocuments { get; set; }
+    public DbSet<UserActivity> UserActivities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +37,11 @@ public class UserManagementDbContext : IdentityDbContext<ApplicationUser>
             .HasColumnType("text")
             .ValueGeneratedNever();
 
+        modelBuilder.Entity<UserActivity>()
+            .Property(e => e.Id)
+            .HasColumnType("text")
+            .ValueGeneratedNever();
+
         // Configure UserProfile relationship with ApplicationUser
         modelBuilder.Entity<ApplicationUser>()
             .HasOne(u => u.Profile)
@@ -53,6 +59,13 @@ public class UserManagementDbContext : IdentityDbContext<ApplicationUser>
             .HasMany(u => u.Documents)
             .WithOne(d => d.UserProfile)
             .HasForeignKey(d => d.UserProfileId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure UserActivity relationship with ApplicationUser
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Activities)
+            .WithOne(a => a.User)
+            .HasForeignKey(a => a.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Configure indexes

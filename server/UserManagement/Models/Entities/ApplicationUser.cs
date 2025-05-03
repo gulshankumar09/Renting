@@ -14,4 +14,5 @@ public class ApplicationUser : IdentityUser
 
     // One-to-one relationship with profile
     public virtual UserProfile? Profile { get; set; }
+    public virtual ICollection<UserActivity> Activities { get; set; } = new List<UserActivity>();
 }
