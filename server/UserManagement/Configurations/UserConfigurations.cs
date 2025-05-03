@@ -8,12 +8,29 @@ public sealed class UserConfigurations
 {
     public static void ConfigureUsers(ModelBuilder modelBuilder)
     {
-        ConfigureUserProfile(modelBuilder);
-        ConfigureApplicationUser(modelBuilder);
-    }
+        // Configure entities that inherit from BaseEntity to have string Id (not identity)
+        modelBuilder.Entity<UserProfile>()
+            .Property(e => e.Id)
+            .HasColumnType("text")
+            .ValueGeneratedNever();
 
-    private static void ConfigureUserProfile(ModelBuilder modelBuilder)
-    {
+        modelBuilder.Entity<UserPreferences>()
+            .Property(e => e.Id)
+            .HasColumnType("text")
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<UserDocument>()
+            .Property(e => e.Id)
+            .HasColumnType("text")
+            .ValueGeneratedNever();
+
+        // Configure UserProfile relationship with ApplicationUser
+        modelBuilder.Entity<ApplicationUser>()
+            .HasOne(u => u.Profile)
+            .WithOne(p => p.ApplicationUser)
+            .HasForeignKey<UserProfile>(p => p.ApplicationUserId);
+
+        // Configure UserProfile
         modelBuilder.Entity<UserProfile>()
             .HasOne(u => u.Preferences)
             .WithOne(p => p.UserProfile)
@@ -26,13 +43,12 @@ public sealed class UserConfigurations
             .HasForeignKey(d => d.UserProfileId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Configure indexes
         modelBuilder.Entity<UserProfile>()
             .HasIndex(u => u.PhoneNumber)
             .IsUnique();
-    }
 
-    private static void ConfigureApplicationUser(ModelBuilder modelBuilder)
-    {
+        // Configure Identity
         modelBuilder.Entity<ApplicationUser>()
             .HasIndex(u => u.Email)
             .IsUnique();
@@ -41,4 +57,5 @@ public sealed class UserConfigurations
             .HasIndex(u => u.PhoneNumber)
             .IsUnique();
     }
+
 }

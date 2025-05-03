@@ -3,12 +3,13 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using UserManagement.Interfaces;
 using UserManagement.Models.Entities;
 using UserManagement.Models.Exceptions;
 
 namespace UserManagement.Services;
 
-public class JwtTokenService
+public class JwtTokenService : IJwtTokenService
 {
     private readonly IConfiguration _configuration;
 

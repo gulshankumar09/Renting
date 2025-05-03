@@ -250,11 +250,8 @@ namespace UserManagement.Migrations
 
             modelBuilder.Entity("UserManagement.Models.Entities.UserDocument", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -329,11 +326,8 @@ namespace UserManagement.Migrations
 
             modelBuilder.Entity("UserManagement.Models.Entities.UserPreferences", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -345,6 +339,9 @@ namespace UserManagement.Migrations
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("DarkMode")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("DateFormat")
                         .IsRequired()

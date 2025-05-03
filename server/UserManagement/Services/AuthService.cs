@@ -12,16 +12,19 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<AuthService> _logger;
-    private readonly JwtTokenService _jwtTokenService;
+    private readonly IJwtTokenService _jwtTokenService;
+    private readonly IEmailService _emailService;
 
-    public AuthService(UserManager<ApplicationUser> userManager, 
-    IConfiguration configuration, 
-    ILogger<AuthService> logger,
-    JwtTokenService jwtTokenService)
+    public AuthService(
+        UserManager<ApplicationUser> userManager,
+        ILogger<AuthService> logger,
+        IJwtTokenService jwtTokenService,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _logger = logger;
         _jwtTokenService = jwtTokenService;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponseDTO> LoginAsync(LoginRequestDTO request)
@@ -31,6 +34,17 @@ public class AuthService : IAuthService
 
         if (!await _userManager.CheckPasswordAsync(user, request.Password))
             throw new AuthException("Invalid email or password", "INVALID_CREDENTIALS");
+
+        if (!user.EmailConfirmed && await _userManager.IsEmailConfirmedAsync(user))
+        {
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+        }
+
+        if (!user.EmailConfirmed)
+        {
+            throw new AuthException("Email not confirmed. Please check your email for verification link.", "EMAIL_NOT_VERIFIED");
+        }
 
         _logger.LogInformation("User {Email} logged in successfully", request.Email);
 
@@ -48,7 +62,8 @@ public class AuthService : IAuthService
             UserName = request.Email,
             Email = request.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            EmailConfirmed = false
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -58,12 +73,16 @@ public class AuthService : IAuthService
                 "REGISTRATION_FAILED"
             );
 
+        // Generate email confirmation token and send verification email
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _emailService.SendEmailVerificationAsync(user.Email!, user.Id, token);
+
         return await GenerateAuthResponseAsync(user);
     }
 
     public async Task<AuthResponseDTO> RefreshTokenAsync(RefreshTokenRequestDTO request)
     {
-        var principal = GetPrincipalFromExpiredToken(request.Token);
+        var principal = _jwtTokenService.GetPrincipalFromExpiredToken(request.Token);
         var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (userId == null)
@@ -96,6 +115,100 @@ public class AuthService : IAuthService
         return result.Succeeded;
     }
 
+    // Email Verification
+    public async Task<bool> VerifyEmailAsync(VerifyEmailDTO verifyEmailDto)
+    {
+        var user = await _userManager.FindByIdAsync(verifyEmailDto.UserId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for email verification: {UserId}", verifyEmailDto.UserId);
+            return false;
+        }
+
+        if (user.EmailConfirmed)
+        {
+            return true; // Email already verified
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, verifyEmailDto.Token);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Email verified successfully for user: {Email}", user.Email);
+            return true;
+        }
+
+        _logger.LogWarning("Email verification failed for user: {Email}, errors: {Errors}",
+            user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+        return false;
+    }
+
+    public async Task<bool> ResendVerificationEmailAsync(ResendVerificationEmailDTO resendVerificationEmailDto)
+    {
+        var user = await _userManager.FindByEmailAsync(resendVerificationEmailDto.Email);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for resending verification email: {Email}", resendVerificationEmailDto.Email);
+            return false;
+        }
+
+        if (user.EmailConfirmed)
+        {
+            return true; // Email already verified
+        }
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        await _emailService.SendEmailVerificationAsync(user.Email!, user.Id, token);
+
+        _logger.LogInformation("Verification email resent to: {Email}", user.Email);
+        return true;
+    }
+
+    // Password Reset
+    public async Task<bool> ForgotPasswordAsync(ForgotPasswordDTO forgotPasswordDto)
+    {
+        var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+        if (user == null)
+        {
+            // We return true even if the user is not found for security reasons
+            _logger.LogWarning("User not found for password reset: {Email}", forgotPasswordDto.Email);
+            return true;
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        await _emailService.SendPasswordResetEmailAsync(user.Email!, user.Id, token);
+
+        _logger.LogInformation("Password reset email sent to: {Email}", user.Email);
+        return true;
+    }
+
+    public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDTO resetPasswordDto)
+    {
+        var user = await _userManager.FindByIdAsync(resetPasswordDto.UserId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for password reset: {UserId}", resetPasswordDto.UserId);
+            return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+        if (result.Succeeded)
+        {
+            _logger.LogInformation("Password reset successful for user: {Email}", user.Email);
+
+            // Revoke any existing refresh tokens for security
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+        }
+        else
+        {
+            _logger.LogWarning("Password reset failed for user: {Email}, errors: {Errors}",
+                user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        return result;
+    }
+
     private async Task<AuthResponseDTO> GenerateAuthResponseAsync(ApplicationUser user)
     {
         var token = _jwtTokenService.GenerateJwtToken(user);
@@ -112,17 +225,11 @@ public class AuthService : IAuthService
         };
     }
 
-    
     private static string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
-    }
-
-    private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-    {
-        return _jwtTokenService.GetPrincipalFromExpiredToken(token);
     }
 }

@@ -210,8 +210,7 @@ namespace UserManagement.Migrations
                 name: "UserDocuments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<string>(type: "text", nullable: false),
                     UserProfileId = table.Column<string>(type: "text", nullable: false),
                     DocumentType = table.Column<string>(type: "text", nullable: false),
                     DocumentNumber = table.Column<string>(type: "text", nullable: false),
@@ -247,9 +246,9 @@ namespace UserManagement.Migrations
                 name: "UserPreferences",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<string>(type: "text", nullable: false),
                     UserProfileId = table.Column<string>(type: "text", nullable: false),
+                    DarkMode = table.Column<bool>(type: "boolean", nullable: false),
                     EmailNotifications = table.Column<bool>(type: "boolean", nullable: false),
                     PushNotifications = table.Column<bool>(type: "boolean", nullable: false),
                     SMSNotifications = table.Column<bool>(type: "boolean", nullable: false),

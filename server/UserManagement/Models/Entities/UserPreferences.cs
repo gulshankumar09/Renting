@@ -3,6 +3,7 @@ namespace UserManagement.Models.Entities;
 public class UserPreferences : BaseEntity
 {
     public string UserProfileId { get; set; } = string.Empty;
+    public bool DarkMode { get; set; }
 
     // Communication Preferences
     public bool EmailNotifications { get; set; }
