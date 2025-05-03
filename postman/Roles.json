@@ -1,0 +1,295 @@
+{
+  "name": "Roles",
+  "item": [
+    {
+      "name": "Get All Roles",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// If there are roles, save the first role ID for later use",
+              "var jsonData = JSON.parse(responseBody);",
+              "if (jsonData && jsonData.length > 0) {",
+              "    pm.environment.set(\"roleId\", jsonData[0].id);",
+              "    pm.environment.set(\"roleName\", jsonData[0].name);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/Role",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role"]
+        },
+        "description": "Get all roles (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Role By Id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/{{roleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "{{roleId}}"]
+        },
+        "description": "Get role by ID (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Role",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "var jsonData = JSON.parse(responseBody);",
+              "pm.environment.set(\"roleId\", jsonData.id);",
+              "pm.environment.set(\"roleName\", jsonData.name);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"TestRole\",\n    \"description\": \"A test role created via Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/Role",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role"]
+        },
+        "description": "Create a new role (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Role",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"UpdatedRole\",\n    \"description\": \"An updated test role\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/{{roleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "{{roleId}}"]
+        },
+        "description": "Update a role (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Role",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/{{roleId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "{{roleId}}"]
+        },
+        "description": "Delete a role (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users In Role",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/users-in-role/{{roleName}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "users-in-role", "{{roleName}}"]
+        },
+        "description": "Get users in a specific role (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Assign Role",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": \"{{userId}}\",\n    \"roleName\": \"{{roleName}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/assign-role",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "assign-role"]
+        },
+        "description": "Assign a role to a user (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Remove Role",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": \"{{userId}}\",\n    \"roleName\": \"{{roleName}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/remove-role",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "remove-role"]
+        },
+        "description": "Remove a role from a user (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Roles",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/Role/user-roles/{{userId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "Role", "user-roles", "{{userId}}"]
+        },
+        "description": "Get roles for a specific user"
+      },
+      "response": []
+    }
+  ],
+  "description": "Role management endpoints"
+}

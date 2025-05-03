@@ -1,0 +1,175 @@
+{
+  "name": "User Preferences",
+  "item": [
+    {
+      "name": "Get My Preferences",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "preferences"]
+        },
+        "description": "Get the current user's preferences"
+      },
+      "response": []
+    },
+    {
+      "name": "Update My Preferences",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"theme\": \"dark\",\n    \"notificationsEnabled\": true,\n    \"emailNotifications\": true,\n    \"smsNotifications\": false,\n    \"language\": \"en-US\",\n    \"timeZone\": \"UTC\",\n    \"dateFormat\": \"MM/dd/yyyy\",\n    \"timeFormat\": \"HH:mm\",\n    \"currency\": \"USD\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "preferences"]
+        },
+        "description": "Update the current user's preferences"
+      },
+      "response": []
+    },
+    {
+      "name": "Reset My Preferences",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences/reset",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "preferences", "reset"]
+        },
+        "description": "Reset the current user's preferences to defaults"
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Preferences (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences/users/{{userProfileId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "preferences", "users", "{{userProfileId}}"]
+        },
+        "description": "Get preferences for a specific user (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Update User Preferences (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"theme\": \"light\",\n    \"notificationsEnabled\": true,\n    \"emailNotifications\": true,\n    \"smsNotifications\": false,\n    \"language\": \"en-US\",\n    \"timeZone\": \"UTC\",\n    \"dateFormat\": \"MM/dd/yyyy\",\n    \"timeFormat\": \"HH:mm\",\n    \"currency\": \"USD\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences/users/{{userProfileId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "preferences", "users", "{{userProfileId}}"]
+        },
+        "description": "Update preferences for a specific user (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Reset User Preferences (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/preferences/users/{{userProfileId}}/reset",
+          "host": ["{{baseUrl}}"],
+          "path": [
+            "api",
+            "v1",
+            "preferences",
+            "users",
+            "{{userProfileId}}",
+            "reset"
+          ]
+        },
+        "description": "Reset preferences for a specific user to defaults (Admin only)"
+      },
+      "response": []
+    }
+  ],
+  "description": "User preferences endpoints"
+}

@@ -1,0 +1,266 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "name": "Renting API",
+    "description": "API collection for the Renting application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "pm.environment.set(\"authToken\", jsonData.token);",
+                  "pm.environment.set(\"refreshToken\", jsonData.refreshToken);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "login"]
+            },
+            "description": "Authenticate a user and get access token"
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"StrongPassword123!\",\n    \"confirmPassword\": \"StrongPassword123!\",\n    \"firstName\": \"New\",\n    \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "register"]
+            },
+            "description": "Register a new user"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "pm.environment.set(\"authToken\", jsonData.token);",
+                  "pm.environment.set(\"refreshToken\", jsonData.refreshToken);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "refresh-token"]
+            },
+            "description": "Refresh access token using refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"{{userPassword}}\",\n    \"newPassword\": \"NewStrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "change-password"]
+            },
+            "description": "Change user password"
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/revoke-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "revoke-token"]
+            },
+            "description": "Revoke the current user's refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\",\n    \"token\": \"verification-token-from-email\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/verify-email",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "verify-email"]
+            },
+            "description": "Verify user email with token"
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Verification Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/resend-verification-email",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "resend-verification-email"]
+            },
+            "description": "Resend verification email"
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "forgot-password"]
+            },
+            "description": "Request password reset email"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\",\n    \"token\": \"reset-token-from-email\",\n    \"password\": \"NewStrongPassword123!\",\n    \"confirmPassword\": \"NewStrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "reset-password"]
+            },
+            "description": "Reset password with token"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints"
+    }
+  ]
+}

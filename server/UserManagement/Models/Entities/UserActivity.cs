@@ -2,7 +2,7 @@ using System;
 
 namespace UserManagement.Models.Entities;
 
-public class UserActivity : BaseEntity
+public sealed class UserActivity : BaseEntity
 {
     public string UserId { get; set; } = string.Empty;
     public string ActivityType { get; set; } = string.Empty;
@@ -13,5 +13,5 @@ public class UserActivity : BaseEntity
     public string? AdditionalInfo { get; set; }
 
     // Navigation property
-    public virtual ApplicationUser User { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 }

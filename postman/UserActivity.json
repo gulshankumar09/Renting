@@ -1,0 +1,223 @@
+{
+  "name": "User Activity",
+  "item": [
+    {
+      "name": "Get All Activities (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities?page=1&pageSize=10&sortBy=createdAt&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            },
+            {
+              "key": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Get all user activities (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get My Activities",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// If there are activities, save the first activity ID for later use",
+              "var jsonData = JSON.parse(responseBody);",
+              "if (jsonData && jsonData.length > 0) {",
+              "    pm.environment.set(\"activityId\", jsonData[0].id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities/me?page=1&pageSize=10&sortBy=createdAt&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities", "me"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            },
+            {
+              "key": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Get the current user's activities"
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Activities (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities/users/{{userId}}?page=1&pageSize=10&sortBy=createdAt&sortOrder=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities", "users", "{{userId}}"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            },
+            {
+              "key": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Get activities for a specific user (Admin only)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Activity By Id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities/{{activityId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities", "{{activityId}}"]
+        },
+        "description": "Get activity by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "Get My Activity Summary",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities/summary/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities", "summary", "me"]
+        },
+        "description": "Get the current user's activity summary"
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Activity Summary (Admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/activities/summary/users/{{userId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "activities", "summary", "users", "{{userId}}"]
+        },
+        "description": "Get activity summary for a specific user (Admin only)"
+      },
+      "response": []
+    }
+  ],
+  "description": "User activity endpoints"
+}
