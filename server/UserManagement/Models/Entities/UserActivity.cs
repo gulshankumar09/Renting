@@ -4,7 +4,7 @@ namespace UserManagement.Models.Entities;
 
 public sealed class UserActivity : BaseEntity
 {
-    public string UserId { get; set; } = string.Empty;
+    public string? UserId { get; set; } = string.Empty;
     public string ActivityType { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string IpAddress { get; set; } = string.Empty;

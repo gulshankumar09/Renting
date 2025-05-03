@@ -133,7 +133,7 @@ public class UserActivityService : IUserActivityService
         };
     }
 
-    public async Task<bool> LogLoginAttemptAsync(string userId, bool isSuccessful, string ipAddress, string userAgent, string? errorMessage = null)
+    public async Task<bool> LogLoginAttemptAsync(string? userId, bool isSuccessful, string ipAddress, string userAgent, string? errorMessage = null)
     {
         var activityType = isSuccessful ? ActivityType.Login : ActivityType.FailedLogin;
         var description = isSuccessful ? "User logged in successfully" : "Failed login attempt";
@@ -154,7 +154,7 @@ public class UserActivityService : IUserActivityService
         _context.UserActivities.Add(activity);
 
         // Update last login time if successful
-        if (isSuccessful)
+        if (isSuccessful && !string.IsNullOrEmpty(userId))
         {
             var user = await _context.Users.FindAsync(userId);
             if (user != null)
@@ -172,7 +172,7 @@ public class UserActivityService : IUserActivityService
         return await LogGenericActivityAsync(userId, ActivityType.ProfileUpdate, description, ipAddress, userAgent);
     }
 
-    public async Task<bool> LogGenericActivityAsync(string userId, ActivityType activityType, string description, string ipAddress, string userAgent, bool isSuccessful = true, string? additionalInfo = null)
+    public async Task<bool> LogGenericActivityAsync(string? userId, ActivityType activityType, string description, string ipAddress, string userAgent, bool isSuccessful = true, string? additionalInfo = null)
     {
         var activity = new UserActivity
         {
@@ -224,8 +224,16 @@ public class UserActivityService : IUserActivityService
 
     private async Task<UserActivityResponseDto> MapToUserActivityResponseDto(UserActivity activity)
     {
-        var user = await _context.Users.FindAsync(activity.UserId);
-        string userEmail = user?.Email ?? "Unknown";
+        string userEmail = "Unknown";
+
+        if (!string.IsNullOrEmpty(activity.UserId))
+        {
+            var user = await _context.Users.FindAsync(activity.UserId);
+            if (user != null)
+            {
+                userEmail = user.Email ?? "Unknown";
+            }
+        }
 
         return new UserActivityResponseDto
         {

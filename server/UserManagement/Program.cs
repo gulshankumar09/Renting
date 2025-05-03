@@ -7,10 +7,12 @@ using System.Text;
 using Shared.Common.Extensions;
 using UserManagement.Data;
 using UserManagement.Models.Entities;
-using UserManagement.Services;
 using UserManagement.Extensions;
+using Shared.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddSeriLog();
 
 // Add services to the container.
 builder.Services.AddControllers();

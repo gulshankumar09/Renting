@@ -3,18 +3,22 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Shared.Common.Exceptions;
-
+using Microsoft.Extensions.Hosting;
 namespace Shared.Common.Middleware;
 
 public class GlobalExceptionHandler
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionHandler> _logger;
+    private readonly IHostEnvironment _env;
 
-    public GlobalExceptionHandler(RequestDelegate next, ILogger<GlobalExceptionHandler> logger)
+    public GlobalExceptionHandler(RequestDelegate next,
+        ILogger<GlobalExceptionHandler> logger,
+        IHostEnvironment env)
     {
         _next = next;
         _logger = logger;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -23,6 +27,11 @@ public class GlobalExceptionHandler
         {
             await _next(context);
         }
+        catch (ServiceBaseException ex)
+        {
+            _logger.LogError(ex, "An unhandled exception occurred");
+            await HandleExceptionAsync(context, ex);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unhandled exception occurred");
@@ -30,62 +39,59 @@ public class GlobalExceptionHandler
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        var response = new ApiErrorResponse();
+        var correlationId = context.Items["TraceId"] as string;
 
-        switch (exception)
+        (int statusCode, string? errorCode) = exception switch
         {
-            case UnauthorizedAccessException:
-                response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                response.Message = "Unauthorized access";
-                break;
+            // Custom Exceptions
+            ServiceBaseException ex => (ex.StatusCode, ex.ErrorCode),
 
-            case KeyNotFoundException:
-                response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.Message = "Resource not found";
-                break;
+            // Standard Exceptions
+            ArgumentNullException _ => ((int)HttpStatusCode.BadRequest, "ARGUMENT_NULL"),
+            ArgumentOutOfRangeException _ => ((int)HttpStatusCode.BadRequest, "ARGUMENT_OUT_OF_RANGE"),
+            InvalidOperationException _ => ((int)HttpStatusCode.BadRequest, "INVALID_OPERATION"),
+            KeyNotFoundException _ => ((int)HttpStatusCode.NotFound, "KEY_NOT_FOUND"),
+            FormatException _ => ((int)HttpStatusCode.BadRequest, "FORMAT_ERROR"),
+            NullReferenceException _ => ((int)HttpStatusCode.InternalServerError, "NULL_REFERENCE"),
+            UnauthorizedAccessException _ => ((int)HttpStatusCode.Forbidden, "UNAUTHORIZED_ACCESS"),
+            FileNotFoundException _ => ((int)HttpStatusCode.NotFound, "FILE_NOT_FOUND"),
+            IOException _ => ((int)HttpStatusCode.InternalServerError, "IO_ERROR"),
+            HttpRequestException ex => ((int)HttpStatusCode.BadRequest, "BAD_HTTP_REQUEST"),
+            _ => ((int)HttpStatusCode.InternalServerError, "INTERNAL_SERVER_ERROR")
+        };
 
-            case ValidationException validationEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.Message = "Validation failed";
-                response.Errors = validationEx.Errors;
-                break;
-
-            case BusinessException businessEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.Message = businessEx.Message;
-                response.ErrorCode = businessEx.ErrorCode;
-                break;
-
-            case ArgumentException argEx:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.Message = argEx.Message;
-                break;
-
-            default:
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.Message = "An internal server error occurred";
-#if DEBUG
-                response.StackTrace = exception.StackTrace;
-#endif
-                break;
-        }
-
-        context.Response.StatusCode = response.StatusCode;
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions
+        context.Response.StatusCode = statusCode;
+        var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        }));
-    }
-}
+        };
 
-public class ApiErrorResponse
-{
-    public int StatusCode { get; set; }
-    public string Message { get; set; } = string.Empty;
-    public string? ErrorCode { get; set; }
-    public IDictionary<string, string[]>? Errors { get; set; }
-    public string? StackTrace { get; set; }
+        if (_env.IsDevelopment())
+        {
+            var response = new
+            {
+                CorrelationId = correlationId,
+                StatusCode = statusCode,
+                Message = exception.Message,
+                ErrorCode = errorCode ?? "UNKNOWN_ERROR",
+                StackTrace = exception.StackTrace,
+                InnerException = exception.InnerException?.Message
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+        }
+        else
+        {
+            var response = new
+            {
+                CorrelationId = correlationId,
+                StatusCode = statusCode,
+                Message = exception.Message,
+                ErrorCode = errorCode ?? "UNKNOWN_ERROR",
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+        }
+    }
 }

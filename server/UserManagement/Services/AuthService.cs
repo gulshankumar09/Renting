@@ -53,7 +53,7 @@ public class AuthService : IAuthService
             if (user == null)
             {
                 await _activityService.LogLoginAttemptAsync(
-                    "unknown",
+                    null,
                     false,
                     ipAddress,
                     userAgent,
@@ -127,7 +127,7 @@ public class AuthService : IAuthService
             if (existingUser != null)
             {
                 await _activityService.LogGenericActivityAsync(
-                    "unknown",
+                    null,
                     ActivityType.Registration,
                     $"Registration failed: Email {request.Email} already exists",
                     ipAddress,
@@ -152,7 +152,7 @@ public class AuthService : IAuthService
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
 
                 await _activityService.LogGenericActivityAsync(
-                    "unknown",
+                    null,
                     ActivityType.Registration,
                     $"Registration failed: {errors}",
                     ipAddress,

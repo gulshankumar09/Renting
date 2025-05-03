@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserManagement.Data;
@@ -12,9 +13,11 @@ using UserManagement.Data;
 namespace UserManagement.Migrations
 {
     [DbContext(typeof(UserManagementDbContext))]
-    partial class UserManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503080959_UpdateUserActivity")]
+    partial class UpdateUserActivity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,7 +310,7 @@ namespace UserManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserActivities", (string)null);
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("UserManagement.Models.Entities.UserDocument", b =>
@@ -383,7 +386,7 @@ namespace UserManagement.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("UserDocuments", (string)null);
+                    b.ToTable("UserDocuments");
                 });
 
             modelBuilder.Entity("UserManagement.Models.Entities.UserPreferences", b =>
@@ -529,7 +532,7 @@ namespace UserManagement.Migrations
                     b.HasIndex("UserProfileId")
                         .IsUnique();
 
-                    b.ToTable("UserPreferences", (string)null);
+                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("UserManagement.Models.Entities.UserProfile", b =>
@@ -630,7 +633,7 @@ namespace UserManagement.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

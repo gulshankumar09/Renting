@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Models.Entities;
 
@@ -24,6 +23,11 @@ public sealed class UserConfigurations
             .HasColumnType("text")
             .ValueGeneratedNever();
 
+        modelBuilder.Entity<UserActivity>()
+            .Property(e => e.Id)
+            .HasColumnType("text")
+            .ValueGeneratedNever();
+
         // Configure UserProfile relationship with ApplicationUser
         modelBuilder.Entity<ApplicationUser>()
             .HasOne(u => u.Profile)
@@ -43,6 +47,14 @@ public sealed class UserConfigurations
             .HasForeignKey(d => d.UserProfileId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Configure UserActivity relationship with ApplicationUser
+        modelBuilder.Entity<UserActivity>()
+            .HasOne(a => a.User)
+            .WithMany(u => u.Activities)
+            .HasForeignKey(a => a.UserId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Configure indexes
         modelBuilder.Entity<UserProfile>()
             .HasIndex(u => u.PhoneNumber)
@@ -57,5 +69,4 @@ public sealed class UserConfigurations
             .HasIndex(u => u.PhoneNumber)
             .IsUnique();
     }
-
 }
