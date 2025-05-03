@@ -7,10 +7,9 @@ using UserManagement.Interfaces;
 
 namespace UserManagement.Controllers;
 
-[ApiController]
 [Route("api/v1/preferences")]
 [Authorize]
-public class UserPreferencesController : ControllerBase
+public class UserPreferencesController : BaseApiController
 {
     private readonly IUserPreferencesService _preferencesService;
     private readonly IUserProfileService _userProfileService;

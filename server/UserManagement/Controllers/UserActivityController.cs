@@ -7,10 +7,9 @@ using UserManagement.Interfaces;
 
 namespace UserManagement.Controllers;
 
-[ApiController]
 [Route("api/v1/activities")]
 [Authorize]
-public class UserActivityController : ControllerBase
+public class UserActivityController : BaseApiController
 {
     private readonly IUserActivityService _activityService;
 
@@ -29,7 +28,7 @@ public class UserActivityController : ControllerBase
     {
         var (activities, totalCount) = await _activityService.GetAllActivitiesAsync(filterDto);
 
-        Response.Headers.Add("X-Total-Count", totalCount.ToString());
+        Response.Headers.Append("X-Total-Count", totalCount.ToString());
 
         return Ok(activities);
     }
@@ -48,7 +47,7 @@ public class UserActivityController : ControllerBase
 
         var (activities, totalCount) = await _activityService.GetUserActivitiesAsync(userId, filterDto);
 
-        Response.Headers.Add("X-Total-Count", totalCount.ToString());
+        Response.Headers.Append("X-Total-Count", totalCount.ToString());
 
         return Ok(activities);
     }
@@ -63,7 +62,7 @@ public class UserActivityController : ControllerBase
     {
         var (activities, totalCount) = await _activityService.GetUserActivitiesAsync(userId, filterDto);
 
-        Response.Headers.Add("X-Total-Count", totalCount.ToString());
+        Response.Headers.Append("X-Total-Count", totalCount.ToString());
 
         return Ok(activities);
     }

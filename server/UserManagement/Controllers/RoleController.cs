@@ -5,10 +5,8 @@ using UserManagement.Interfaces;
 
 namespace UserManagement.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
 [Authorize(Roles = "Admin")]
-public class RoleController : ControllerBase
+public class RoleController : BaseApiController
 {
     private readonly IRoleService _roleService;
     private readonly ILogger<RoleController> _logger;

@@ -5,10 +5,8 @@ using UserManagement.Interfaces;
 
 namespace UserManagement.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
 [Authorize]
-public class UserProfileController : ControllerBase
+public class UserProfileController : BaseApiController
 {
     private readonly IUserProfileService _userProfileService;
     private readonly ILogger<UserProfileController> _logger;

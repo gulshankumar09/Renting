@@ -7,10 +7,8 @@ using UserManagement.Interfaces;
 
 namespace UserManagement.Controllers;
 
-[ApiController]
-[Route("api/v1/documents")]
 [Authorize]
-public class DocumentController : ControllerBase
+public class DocumentController : BaseApiController
 {
     private readonly IDocumentService _documentService;
     private readonly IUserProfileService _userProfileService;
